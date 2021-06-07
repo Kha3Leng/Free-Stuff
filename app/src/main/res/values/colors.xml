@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    // primary color
+    <color name="megamen">#0abde3</color>
+    <color name="cyanite">#0abde3</color>
+
+    // secondary color
+    <color name="carribean">#1dd1a1</color>
+    <color name="meadow">#10ac84</color>
+    
+    // Dark Color
+    <color name="prestiage">#2f3542</color>
+    <color name="gris">#57606f</color>
+    <color name="bluenight">#121212</color>
+    
+    // lighter Color
+    <color name="soda">#718093</color>
+    <color name="chaingun">#576574</color>
+    
+    
+    // light color
+    <color name="lynx">#f5f6fa</color>
+    <color name="pensive">#dcdde1</color>
+</resources>
