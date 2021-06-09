@@ -14,9 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.yausername.youtubedl_android.DownloadProgressCallback;
 import com.yausername.youtubedl_android.YoutubeDL;
 import com.yausername.youtubedl_android.YoutubeDLException;
 import com.yausername.youtubedl_android.YoutubeDLRequest;
+import com.yausername.youtubedl_android.YoutubeDLResponse;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -32,6 +34,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btnDownload;
 
     Boolean downloading = false;
+
+    DownloadProgressCallback callback = new DownloadProgressCallback() {
+        @Override
+        public void onProgressUpdate(float progress, long etaInSeconds) {
+            runOnUiThread(() -> {
+                pgLoading.setProgress((int) progress);
+                tvDownloadStatus.setText(String.valueOf(progress) + "% (ETA " + String.valueOf(etaInSeconds) + " seconds");
+            });
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvDownloadStatus = findViewById(R.id.downloadStatus);
         etUrl = findViewById(R.id.url);
         pgLoading = findViewById(R.id.progressBarLoading);
-        pgLoop = findViewById(R.id.pgLoop);
+        pgLoop = findViewById(R.id.pgb_progress4);
         navView = findViewById(R.id.nav_view);
         btnDownload = findViewById(R.id.btn);
     }
@@ -92,21 +104,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         downloading=true;
 
-        try {
-            YoutubeDL.getInstance().execute(youtubeDL, (progress, etaInSeconds) -> {
-                System.out.println(String.valueOf(progress) + "% (ETA " + String.valueOf(etaInSeconds) + " seconds)");
-            });
-        } catch (YoutubeDLException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        getMp3(youtubeDL);
+
+    }
+
+    private void getMp3(YoutubeDLRequest youtubeDL) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    YoutubeDLResponse youtubeDLResponse = YoutubeDL.getInstance().execute(youtubeDL, callback);
+
+                    runOnUiThread(()->{
+                        tvCommandOutput.setText(youtubeDLResponse.getOut());
+                        tvDownloadStatus.setText("Download Complete");
+                        pgLoading.setProgress(100);
+                        pgLoading.setVisibility(View.GONE);
+                        pgLoop.setVisibility(View.GONE);
+                    });
+                } catch (YoutubeDLException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
     }
 
     private void showStart() {
         tvDownloadStatus.setText("Start Downloading...");
         pgLoading.setProgress(0);
+        pgLoading.setVisibility(View.VISIBLE);
         pgLoop.setVisibility(View.VISIBLE);
+
     }
 
     private File getDownloadDir() {
