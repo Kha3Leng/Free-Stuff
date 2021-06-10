@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -21,6 +22,7 @@ import com.yausername.youtubedl_android.YoutubeDL;
 import com.yausername.youtubedl_android.YoutubeDLException;
 import com.yausername.youtubedl_android.YoutubeDLRequest;
 import com.yausername.youtubedl_android.YoutubeDLResponse;
+import com.yausername.youtubedl_android.mapper.VideoInfo;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -36,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btnDownload;
     ProgressDialog progressDialog;
     Boolean downloading = false;
+    String url;
+    InputMethodManager imm;
 
     final DownloadProgressCallback callback = new DownloadProgressCallback() {
         @Override
@@ -71,29 +75,83 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         navView = findViewById(R.id.nav_view);
         btnDownload = findViewById(R.id.btn);
         progressDialog = new ProgressDialog(this);
+        imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
     }
 
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btn){
+            // checking editext value
+            url = etUrl.getText().toString();
+            if(TextUtils.isEmpty(url)){
+                etUrl.setHint("Enter a valid url");
+                return;
+            }
             // before downloading
             prepareDownloading();
         }
     }
 
-    private void prepareDownloading() {
+    private YoutubeDLRequest buildRequest() {
+        YoutubeDLRequest youtubeDL = new YoutubeDLRequest(url);
+        File ytdlDir = getDownloadDir();
 
+        youtubeDL.addOption("-x");
+        youtubeDL.addOption("--audio-format", "mp3");
+        youtubeDL.addOption("--audio-quality", "320K");
+        youtubeDL.addOption("--embed-thumbnail");
+        youtubeDL.addOption("-o", ytdlDir.getAbsolutePath()+"/%(title)s.%(ext)s");
+        return  youtubeDL;
     }
 
-    private void startDownload() {
+    private void prepareDownloading() {
+        imm.hideSoftInputFromWindow(etUrl.getWindowToken(), 0);
+        linkChecking();
+    }
 
-        progressDialog.setMessage("Downloading Music");
+    private void showProgressDialog(String info, Boolean indeterminate) {
+        progressDialog.setMessage(info);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setIndeterminate(false);
+        progressDialog.setIndeterminate(indeterminate);
         progressDialog.setProgress(0);
         progressDialog.setMax(100);
         progressDialog.setCancelable(false);
         progressDialog.show();
+    }
+
+    private void linkChecking()  {
+        showProgressDialog("Checking URL", true);
+
+        // because of this YoutubeDL.getInstance(),
+        // run it in a thread.
+        new Thread(()->{
+            try {
+                VideoInfo videoInfo = YoutubeDL.getInstance().getInfo(url);
+                if (videoInfo != null)
+                    runOnUiThread(()->{
+                        progressDialog.dismiss();
+                        showBottomSheetDownloadOptions();
+                    });
+            }catch (YoutubeDLException e){
+                showException(e);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+                runOnUiThread(()->{
+                    View parentView = findViewById(android.R.id.content);
+                    Snackbar.make(parentView, "InterruptedException "+e.getMessage(), Snackbar.LENGTH_LONG).show();
+                });
+            }
+        }).start();
+    }
+
+    private void showBottomSheetDownloadOptions() {
+        DownloadOptionsSheetFragment bottomSheet = new DownloadOptionsSheetFragment();
+        bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
+//        startDownload();
+    }
+
+
+    private void startDownload() {
 
         if(downloading){
             Toast.makeText(this, "Downloading in progress", Toast.LENGTH_SHORT).show();
@@ -103,77 +161,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "Give storage permission and retry..", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        String url = etUrl.getText().toString();
-        if(TextUtils.isEmpty(url)){
-            etUrl.setHint("Enter a valid url");
-            return;
-        }
-
-        YoutubeDLRequest youtubeDL = new YoutubeDLRequest(url);
-        File ytdlDir = getDownloadDir();
-
-        youtubeDL.addOption("-x");
-        youtubeDL.addOption("--audio-format", "mp3");
-        youtubeDL.addOption("--audio-quality", "320K");
-        youtubeDL.addOption("--embed-thumbnail");
-        youtubeDL.addOption("-o", ytdlDir.getAbsolutePath()+"/%(title)s.%(ext)s");
-
         showStart();
-
         downloading=true;
-
-        getMp3(youtubeDL);
+        getMp3();
 
     }
 
-    private void getMp3(YoutubeDLRequest youtubeDL) {
+    private void getMp3() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-
-                    YoutubeDLResponse youtubeDLResponse = YoutubeDL.getInstance().execute(youtubeDL, callback);
+                    YoutubeDLRequest youtubeDLRequest = buildRequest();
+                    YoutubeDLResponse youtubeDLResponse = YoutubeDL.getInstance().execute(youtubeDLRequest, callback);
 
                     runOnUiThread(()->{
                         endLoading(youtubeDLResponse);
                     });
                 } catch (YoutubeDLException e) {
                     e.printStackTrace();
-                    switch (getExceptionCode(e.getMessage())){
-                        case 1:
-                            runOnUiThread(()->{
-                                View parentLayout = findViewById(android.R.id.content);
-                                Snackbar.make(parentLayout,"Invalid URL", Snackbar.LENGTH_LONG).show();
-
-                                endLoading(e.getMessage());
-                            });
-                            break;
-                        case 2:
-                            runOnUiThread(()->{
-                                View parentLayout = findViewById(android.R.id.content);
-                                Snackbar.make(parentLayout, "No Internet to Download", Snackbar.LENGTH_LONG).show();
-
-                                endLoading(e.getMessage());
-                            });
-                            break;
-                        case 0:
-                            runOnUiThread(()->{
-                                View parentLayout = findViewById(android.R.id.content);
-                                Snackbar.make(parentLayout, "Something wrong..", Snackbar.LENGTH_LONG).show();
-                                endLoading(e.getMessage());
-                            });
-                            break;
-                    }
+                    showException(e);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-
     }
 
+    void showException(YoutubeDLException e){
+        switch (getExceptionCode(e.getMessage())){
+            case 1:
+                runOnUiThread(()->{
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout,"Invalid URL", Snackbar.LENGTH_LONG).show();
 
+                    endLoading(e.getMessage());
+                });
+                break;
+            case 2:
+                runOnUiThread(()->{
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "No Internet to Download", Snackbar.LENGTH_LONG).show();
+
+                    endLoading(e.getMessage());
+                });
+                break;
+            case 0:
+                runOnUiThread(()->{
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Something wrong..", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage());
+                });
+                break;
+        }
+    }
 
     void endLoading(YoutubeDLResponse youtubeDLResponse){
         tvCommandOutput.setText(youtubeDLResponse.getOut());
@@ -196,10 +237,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int getExceptionCode(String error){
         String code1 = "is not a valid URL";
         String code2 = "Unable to download webpage";
+        String code3 = "Failed to fetch video information";
+        String code4 = "Unable to parse video information";
         if (error.contains(code1)){
             return 1;
         }else if ( error.contains(code2)){
             return 2;
+        }else if (error.contains(code3)){
+            return 3;
+        }else if (error.contains(code4)){
+            return 4;
         }
         return 0;
     }
