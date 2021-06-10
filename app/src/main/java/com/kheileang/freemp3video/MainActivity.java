@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onProgressUpdate(float progress, long etaInSeconds) {
             runOnUiThread(() -> {
                 pgLoading.setProgress((int) progress);
-                tvDownloadStatus.setText(String.valueOf(progress) + "% (ETA " + String.valueOf(etaInSeconds) + " seconds");
+                tvDownloadStatus.setText(String.valueOf(progress) + "% ( ETA " + String.valueOf(etaInSeconds) + " seconds ");
             });
         }
     };
