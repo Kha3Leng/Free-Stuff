@@ -98,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         youtubeDL.addOption("-x");
         youtubeDL.addOption("--audio-format", "mp3");
         youtubeDL.addOption("--audio-quality", "320K");
-        youtubeDL.addOption("-o", ytdlDir.getAbsolutePath()+"/%(title)s – %(artist)s.%(ext)s");
+        youtubeDL.addOption("--embed-thumbnail");
+        youtubeDL.addOption("-o", ytdlDir.getAbsolutePath()+"/%(title)s.%(ext)s");
 
         showStart();
 
