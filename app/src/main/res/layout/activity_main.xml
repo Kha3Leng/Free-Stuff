@@ -42,6 +42,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:text="Download Status"
+                android:textSize="16sp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 android:gravity="center_horizontal"
                 android:layout_height="wrap_content"
@@ -67,7 +68,7 @@
                 android:hint="enter url"
                 android:padding="10dp"
                 android:shadowRadius="0.5"
-                android:background="@color/ice"
+                android:background="@color/ash"
                 android:layout_marginLeft="60dp"
                 android:layout_marginRight="60dp"
                 android:layout_marginTop="10dp"

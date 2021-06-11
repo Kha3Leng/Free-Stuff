@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.transition.Slide;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -105,7 +106,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void prepareDownloading() {
-        imm.hideSoftInputFromWindow(etUrl.getWindowToken(), 0);
+        try {
+            imm.hideSoftInputFromWindow(etUrl.getWindowToken(), 0);
+        }catch (Exception e){
+            View rootView = findViewById(android.R.id.content);
+            Snackbar.make(rootView, "Something wrong..", Snackbar.LENGTH_LONG).show();
+        }
         linkChecking();
     }
 
