@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (videoInfo != null)
                     runOnUiThread(()->{
                         progressDialog.dismiss();
-                        showBottomSheetDownloadOptions();
+                        showBottomSheetDownloadOptions(videoInfo);
                     });
             }catch (YoutubeDLException e){
                 showException(e);
@@ -150,8 +150,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
-    private void showBottomSheetDownloadOptions() {
-        DownloadOptionsSheetFragment bottomSheet = new DownloadOptionsSheetFragment();
+    private void showBottomSheetDownloadOptions(VideoInfo videoInfo) {
+        DownloadOptionsSheetFragment bottomSheet = new DownloadOptionsSheetFragment(videoInfo);
         bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
 //        startDownload();
     }

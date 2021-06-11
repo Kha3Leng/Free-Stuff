@@ -2,7 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_gravity="center_horizontal">
 
@@ -10,41 +10,86 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_horizontal"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/modal_title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="This is Modal Title."
-            android:layout_margin="10dp"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:textColor="@color/black"/>
+            android:orientation="horizontal"
+            android:padding="3dp">
+
+            <RelativeLayout
+                android:layout_width="130dp"
+                android:layout_height="100dp">
+
+                <ImageView
+                    android:layout_width="130dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/no_thumbnail"
+                    android:scaleType="centerCrop"
+                    android:id="@+id/thumbnail"
+                    android:text="10:25"
+                    android:gravity="right|bottom"
+                    android:padding="3dp"/>
+
+                <TextView
+                    android:id="@+id/duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10:10"
+                    android:padding="10dp"
+                    android:textColor="@color/gris"
+                    android:layout_alignBottom="@+id/thumbnail"
+                    android:layout_alignRight="@id/thumbnail"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/modal_title"
+                    android:text="This is Modal Title."
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    style="@style/bottomSheetDescriptionStyle" />
+
+
+                <TextView
+                    style="@style/bottomSheetDescriptionStyle"
+                    android:id="@+id/uploader"
+                    android:layout_marginTop="45dp"
+                    android:text="uploader"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/soda"
+            android:background="@color/pensive"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"/>
 
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn1"
-            android:layout_marginTop="16dp"
-            android:text="Button 1"/>
+            android:text="Download as"
+            android:textSize="14dp"
+            android:textColor="@color/bluenight"
+            android:textAlignment="textStart"/>
 
-        <Button
-            android:layout_width="wrap_content"
+        <include
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn2"
-            android:text="Button 2"/>
-
+            layout="@layout/audio_bottom_sheet_layout"/>
 
     </LinearLayout>
 </FrameLayout>
