@@ -102,13 +102,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if(btnNo<6){
             youtubeDL.addOption("-x");
-            youtubeDL.addOption("-f", "bestaudio");
             youtubeDL.addOption("--audio-format", "mp3");
             youtubeDL.addOption("--audio-quality", quality+"K");
             youtubeDL.addOption("--embed-thumbnail");
-        }else if(btnNo>5 && btnNo<12){
-            youtubeDL.addOption("-f", "(mp4)[height="+quality+"]+bestaudio");
+        }else if(btnNo>6 && btnNo<12){
+            youtubeDL.addOption("-f", "bestvideo[height="+quality+"]+bestaudio/best");
         }
+
 
         youtubeDL.addOption("-o", ytdlDir.getAbsolutePath()+"/%(title)s.%(ext)s");
         return  youtubeDL;
@@ -177,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         showStart();
         downloading=true;
+
+        showProgressDialog("Downloading..", false);
         getMp3();
 
     }
@@ -215,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case 2:
                 runOnUiThread(()->{
                     View parentLayout = findViewById(android.R.id.content);
-                    Snackbar.make(parentLayout, "No Internet to Download", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(parentLayout, "No Internet Connection", Snackbar.LENGTH_LONG).show();
 
                     endLoading(e.getMessage());
                 });
@@ -227,6 +229,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     endLoading(e.getMessage());
                 });
                 break;
+            case 3:
+                runOnUiThread(()->{
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Failed to fetch video information", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage());
+                });
+                break;
+            case 4:
+                runOnUiThread(()->{
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Unable to parse video information", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage());
+                });
+                break;
+            case 5:
+                runOnUiThread(()->{
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Unable to download thumbnail.", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage());
+                });
+                break;
+            case 6:
+                runOnUiThread(()->{
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Unable to convert audio.", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage());
+                });
+                break;
+
         }
     }
 
@@ -235,8 +266,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvDownloadStatus.setText("Download Complete");
         pgLoading.setProgress(100);
         pgLoading.setVisibility(View.GONE);
+        etUrl.setEnabled(true);
         pgLoop.setVisibility(View.GONE);
         progressDialog.dismiss();
+        downloading = false;
     }
 
     void endLoading(String errorMessage){
@@ -245,7 +278,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pgLoading.setProgress(100);
         pgLoading.setVisibility(View.GONE);
         pgLoop.setVisibility(View.GONE);
+        etUrl.setEnabled(true);
         progressDialog.dismiss();
+        downloading = false;
     }
 
     private int getExceptionCode(String error){
@@ -253,6 +288,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String code2 = "Unable to download webpage";
         String code3 = "Failed to fetch video information";
         String code4 = "Unable to parse video information";
+        String code5 = "Unable to download thumbnail";
+        String code6 = "audio conversion failed";
         if (error.contains(code1)){
             return 1;
         }else if ( error.contains(code2)){
@@ -261,6 +298,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return 3;
         }else if (error.contains(code4)){
             return 4;
+        }else if (error.contains(code5)){
+            return 5;
+        }else if (error.contains(code6)){
+            return 6;
         }
         return 0;
     }
@@ -268,8 +309,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showStart() {
         tvDownloadStatus.setText("Start Downloading...");
         pgLoading.setProgress(0);
-        pgLoading.setVisibility(View.VISIBLE);
-        pgLoop.setVisibility(View.VISIBLE);
+        pgLoading.setVisibility(View.GONE);
+        pgLoop.setVisibility(View.GONE);
+        etUrl.setEnabled(false);
 
     }
 

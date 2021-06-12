@@ -37,7 +37,7 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
     ImageView thumbnail;
     TextView tvDuration, tvModalTitle, tvUploader;
     TextView tv144, tv240, tv480, tv720, tv1080, tv360;
-    MaterialCardView one, two, three, four, five, six, seven, eight, nine, ten, eleven;
+    MaterialCardView one, two, three, four, five, seven, eight, nine, ten, eleven;
     FragmentListener fragmentListener;
 
     public DownloadOptionsSheetFragment(VideoInfo videoInfo) {
@@ -54,7 +54,6 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
         tvModalTitle = view.findViewById(R.id.modal_title);
         tvUploader = view.findViewById(R.id.uploader);
 
-        tv144 = view.findViewById(R.id.mp4144Label);
         tv240 = view.findViewById(R.id.mp4240Label);
         tv360 = view.findViewById(R.id.mp4360Label);
         tv480 = view.findViewById(R.id.mp4480Label);
@@ -95,7 +94,6 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
         three = view.findViewById(R.id.three);
         four = view.findViewById(R.id.four);
         five = view.findViewById(R.id.five);
-        six = view.findViewById(R.id.six);
         seven = view.findViewById(R.id.seven);
         eight = view.findViewById(R.id.eight);
         nine = view.findViewById(R.id.nine);
@@ -107,7 +105,6 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
         three.setOnClickListener(this::onClick);
         four.setOnClickListener(this::onClick);
         five.setOnClickListener(this::onClick);
-        six.setOnClickListener(this::onClick);
         seven.setOnClickListener(this::onClick);
         eight.setOnClickListener(this::onClick);
         nine.setOnClickListener(this::onClick);
@@ -115,7 +112,6 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
         eleven.setOnClickListener(this::onClick);
 
         String[] sizes = {"....",
-                "....",
                 "....",
                 "....",
                 "....",
@@ -139,43 +135,89 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
                 downloadFormatHashMap.put(videoFormat.getHeight(), new DownloadFormat(videoFormat.getExt(), videoFormat.getFilesize()));
             }
 
-            DownloadFormat downloadFormat = downloadFormatHashMap.get(144);
-            sizes[0] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            DownloadFormat downloadFormat = downloadFormatHashMap.get(240);
+            if (downloadFormat != null){
+                sizes[0] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            }else{
+                sizes[0] = "false";
+            }
 
-            downloadFormat = downloadFormatHashMap.get(240);
-            sizes[1] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
 
             downloadFormat = downloadFormatHashMap.get(360);
-            sizes[2] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            if (downloadFormat != null) {
+                sizes[1] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            }else{
+                sizes[1] = "false";
+            }
 
             downloadFormat = downloadFormatHashMap.get(480);
-            sizes[3] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            if (downloadFormat != null) {
+                sizes[2] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            }else{
+                sizes[2] = "false";
+            }
 
             downloadFormat = downloadFormatHashMap.get(720);
-            sizes[4] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            if (downloadFormat != null) {
+                sizes[3] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            }else{
+                sizes[3] = "false";
+            }
 
             downloadFormat = downloadFormatHashMap.get(1080);
-            sizes[5] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            if (downloadFormat != null) {
+                sizes[4] = sizeInMB(downloadFormat.getFileSize()).toString() + "MB";
+            }else{
+                sizes[4] = "false";
+            }
 
             if (sizes.length != 0){
                 getActivity().runOnUiThread(()->{
-                    tv144.setText(sizes[0]);
-                    tv240.setText(sizes[1]);
-                    tv360.setText(sizes[2]);
-                    tv480.setText(sizes[3]);
-                    tv720.setText(sizes[4]);
-                    tv1080.setText(sizes[5]);
+                    if (sizes[0].contains("false")) {
+                        tv240.setEnabled(false);
+                        seven.setOnClickListener(null);
+                    } else {
+                        tv240.setText(sizes[0]);
+                    }
+
+                    if (sizes[1].contains("false")) {
+                        tv360.setEnabled(false);
+                        eight.setOnClickListener(null);
+                    } else {
+                        tv360.setText(sizes[1]);
+                    }
+
+                    if (sizes[2].contains("false")) {
+                        tv480.setEnabled(false);
+                        nine.setOnClickListener(null);
+                    } else {
+                        tv480.setText(sizes[2]);
+                    }
+
+                    if (sizes[3].contains("false")) {
+                        tv720.setEnabled(false);
+                        ten.setOnClickListener(null);
+                    } else {
+                        tv720.setText(sizes[3]);
+                    }
+
+                    if (sizes[4].contains("false")) {
+                        tv1080.setEnabled(false);
+                        eleven.setOnClickListener(null);
+                    } else {
+                        tv1080.setText(sizes[4]);
+                    }
+
                 });
             }
 
 
         }).start();
-        tv144.setText(sizes[0]);
-        tv240.setText(sizes[1]);
-        tv360.setText(sizes[2]);
-        tv480.setText(sizes[3]);
-        tv720.setText(sizes[4]);
-        tv1080.setText(sizes[5]);
+        tv240.setText(sizes[0]);
+        tv360.setText(sizes[1]);
+        tv480.setText(sizes[2]);
+        tv720.setText(sizes[3]);
+        tv1080.setText(sizes[4]);
 
         return view;
     }
@@ -184,7 +226,7 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
     Float sizeInMB(Long filesize){
         Float size;
         DecimalFormat df = new DecimalFormat("#.##");
-        long mb = filesize/(1024*1024);
+        long mb = filesize*10/(1024*1024);
         float kb = (filesize%1024)/1000f;
         size = mb+kb;
         return Float.valueOf(df.format(size));
@@ -229,9 +271,6 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
                 break;
             case R.id.five:
                 fragmentListener.onSendData(5, 320);
-                break;
-            case R.id.six:
-                fragmentListener.onSendData(6, 144);
                 break;
             case R.id.seven:
                 fragmentListener.onSendData(7, 240);
