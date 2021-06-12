@@ -76,9 +76,10 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment {
         int min = secs/60;
         int sec = secs%60;
 
-        tvDuration.setText(""+min+":"+sec);
+        tvDuration.setText(""+(min<10?"0"+min:min)+":"+sec);
         tvModalTitle.setText(videoInfo.getTitle());
         tvUploader.setText(videoInfo.getUploader());
+
 
 
 

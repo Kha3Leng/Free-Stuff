@@ -20,11 +20,11 @@
 
             <RelativeLayout
                 android:layout_width="130dp"
-                android:layout_height="100dp">
+                android:layout_height="80dp">
 
                 <ImageView
                     android:layout_width="130dp"
-                    android:layout_height="100dp"
+                    android:layout_height="80dp"
                     android:src="@drawable/no_thumbnail"
                     android:scaleType="centerCrop"
                     android:id="@+id/thumbnail"
@@ -60,7 +60,7 @@
                 <TextView
                     style="@style/bottomSheetDescriptionStyle"
                     android:id="@+id/uploader"
-                    android:layout_marginTop="45dp"
+                    android:layout_marginTop="10dp"
                     android:text="uploader"/>
 
             </LinearLayout>
@@ -73,10 +73,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/pensive"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="30dp"/>
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -90,6 +88,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             layout="@layout/audio_bottom_sheet_layout"/>
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/video_bottom_sheet_layout"/>
 
     </LinearLayout>
 </FrameLayout>
