@@ -27,8 +27,10 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:id="@+id/one"
             android:layout_columnWeight="1"
             android:layout_margin="0dp"
+            android:onClick="onClick"
             app:cardCornerRadius="10dp"
             app:cardElevation="2dp">
             <LinearLayout
@@ -53,7 +55,9 @@
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_marginLeft="10dp"
+            android:id="@+id/two"
             app:cardCornerRadius="10dp"
+            android:onClick="onClick"
             app:cardElevation="2dp">
             <LinearLayout
                 android:layout_width="match_parent"
@@ -76,32 +80,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:layout_marginLeft="10dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="2dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-                <TextView
-                    android:id="@+id/m4a128"
-                    android:text="M4A 128K"
-                    style="@style/downloadButtonTitileStyle"/>
-
-                <TextView
-                    android:id="@+id/m4a128Label"
-                    style="@style/downloadButtonLabelStyle"
-                    android:text="3.7MB"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
+            android:id="@+id/three"
+            android:layout_marginLeft="10dp"
+            android:onClick="onClick"
             app:cardCornerRadius="10dp"
             app:cardElevation="2dp">
             <LinearLayout
@@ -125,7 +107,35 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
+            android:layout_marginTop="10dp"
+            app:cardCornerRadius="10dp"
+            android:onClick="onClick"
+            android:id="@+id/four"
+            app:cardElevation="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="10dp">
+                <TextView
+                    android:id="@+id/mp3256"
+                    android:text="MP3 256K"
+                    style="@style/downloadButtonTitileStyle"/>
+
+                <TextView
+                    android:id="@+id/mp3256Label"
+                    style="@style/downloadButtonLabelStyle"
+                    android:text="6.7MB"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
             android:layout_marginLeft="10dp"
+            android:id="@+id/five"
+            android:onClick="onClick"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             app:cardElevation="2dp"
@@ -137,13 +147,13 @@
                 android:padding="10dp">
                 <TextView
                     android:id="@+id/mp3320"
-                    android:text="MP3 70K"
+                    android:text="MP3 320K"
                     style="@style/downloadButtonTitileStyle"/>
 
                 <TextView
                     android:id="@+id/mp3320Label"
                     style="@style/downloadButtonLabelStyle"
-                    android:text="7.9MB"/>
+                    android:text="8.9MB"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

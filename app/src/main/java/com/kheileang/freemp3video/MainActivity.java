@@ -30,7 +30,7 @@ import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DownloadOptionsSheetFragment.FragmentListener {
 
     TextView tvCommandOutput, tvDownloadStatus;
     EditText etUrl;
@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Boolean downloading = false;
     String url;
     InputMethodManager imm;
+    int btnNo, quality;
+    VideoInfo videoInfo;
+    DownloadOptionsSheetFragment bottomSheet;
 
     final DownloadProgressCallback callback = new DownloadProgressCallback() {
         @Override
@@ -95,12 +98,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private YoutubeDLRequest buildRequest() {
         YoutubeDLRequest youtubeDL = new YoutubeDLRequest(url);
-        File ytdlDir = getDownloadDir();
+        File ytdlDir = getDownloadDir(btnNo);
 
-        youtubeDL.addOption("-x");
-        youtubeDL.addOption("--audio-format", "mp3");
-        youtubeDL.addOption("--audio-quality", "320K");
-        youtubeDL.addOption("--embed-thumbnail");
+        if(btnNo<6){
+            youtubeDL.addOption("-x");
+            youtubeDL.addOption("-f", "bestaudio");
+            youtubeDL.addOption("--audio-format", "mp3");
+            youtubeDL.addOption("--audio-quality", quality+"K");
+            youtubeDL.addOption("--embed-thumbnail");
+        }else if(btnNo>5 && btnNo<12){
+            youtubeDL.addOption("-f", "(mp4)[height="+quality+"]+bestaudio");
+        }
+
         youtubeDL.addOption("-o", ytdlDir.getAbsolutePath()+"/%(title)s.%(ext)s");
         return  youtubeDL;
     }
@@ -132,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // run it in a thread.
         new Thread(()->{
             try {
-                VideoInfo videoInfo = YoutubeDL.getInstance().getInfo(url);
+                videoInfo = YoutubeDL.getInstance().getInfo(url);
                 if (videoInfo != null)
                     runOnUiThread(()->{
                         progressDialog.dismiss();
@@ -151,9 +160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showBottomSheetDownloadOptions(VideoInfo videoInfo) {
-        DownloadOptionsSheetFragment bottomSheet = new DownloadOptionsSheetFragment(videoInfo);
+        bottomSheet = new DownloadOptionsSheetFragment(videoInfo);
         bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
-//        startDownload();
     }
 
 
@@ -265,13 +273,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private File getDownloadDir() {
+    private File getDownloadDir(int btnNo) {
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File youtubeDir = new File(downloadDir, "FreeStuff");
-        if (!youtubeDir.exists()){
-            youtubeDir.mkdirs();
+        File youtubeAudioDir = new File(downloadDir, "FreeStuff/Free MP3");
+        File youtubeVideoDir = new File(downloadDir, "FreeStuff/Free Video");
+
+        if (btnNo<6) {
+            // MP3
+            if (!youtubeAudioDir.exists()) {
+                youtubeAudioDir.mkdirs();
+            }
+            return youtubeAudioDir;
+        }else{
+            // MP4
+            if (!youtubeVideoDir.exists()) {
+                youtubeVideoDir.mkdirs();
+            }
+            return youtubeVideoDir;
         }
-        return youtubeDir;
     }
 
     private boolean isStoragePermissionGranted() {
@@ -285,5 +304,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else{
             return true;
         }
+    }
+
+    @Override
+    public void onSendData(int btnNo, int quality) {
+        this.btnNo = btnNo;
+        this.quality = quality;
+        // dismiss bottom sheet after user has chosen to download a mp3 or mp4
+        bottomSheet.dismiss();
+        Toast.makeText(this, "Starting to download "+videoInfo.getTitle(), Toast.LENGTH_LONG).show();
+        startDownload();
     }
 }
