@@ -1,13 +1,22 @@
 package com.kheileang.freemp3video;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.text.TextUtils;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -27,8 +36,15 @@ import com.yausername.youtubedl_android.mapper.VideoInfo;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.io.File;
+
+import static com.kheileang.freemp3video.App.CHANNEL_ID;
+import static com.kheileang.freemp3video.App.notificationManager;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DownloadOptionsSheetFragment.FragmentListener {
 
@@ -44,14 +60,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int btnNo, quality;
     VideoInfo videoInfo;
     DownloadOptionsSheetFragment bottomSheet;
+    ViewDownloadFragment viewDownloadFragment;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    NotificationCompat.Builder mNotificationBuilder;
+    PendingIntent pendingIntentActivity;
+
 
     final DownloadProgressCallback callback = new DownloadProgressCallback() {
         @Override
         public void onProgressUpdate(float progress, long etaInSeconds) {
             runOnUiThread(() -> {
-//                pgLoading.setProgress((int) progress);
+                mNotificationBuilder.setProgress(100, (int) progress, false)
+                        .setContentText(String.valueOf(progress) + "% ( ETA " + String.valueOf(etaInSeconds) + " seconds )")
+                        .setOngoing(true)
+                        .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setOnlyAlertOnce(true)
+                        .setContentIntent(pendingIntentActivity);
+                notificationManager.notify(2, mNotificationBuilder.build());
                 progressDialog.setProgress((int) progress);
                 tvDownloadStatus.setText(String.valueOf(progress) + "% ( ETA " + String.valueOf(etaInSeconds) + " seconds )");
+
             });
         }
     };
@@ -80,14 +109,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnDownload = findViewById(R.id.btn);
         progressDialog = new ProgressDialog(this);
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        // intent for getActivity Notifiaction
+        Intent intent = new Intent(this, DownloadActivity.class);
+        pendingIntentActivity = PendingIntent.getActivity(this, 0, intent, 0);
+
+        // building a notification
+        mNotificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
     }
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.btn){
+        if (v.getId() == R.id.btn) {
             // checking editext value
             url = etUrl.getText().toString();
-            if(TextUtils.isEmpty(url)){
+            if (TextUtils.isEmpty(url)) {
                 etUrl.setHint("Enter a valid url");
                 return;
             }
@@ -100,28 +136,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         YoutubeDLRequest youtubeDL = new YoutubeDLRequest(url);
         File ytdlDir = getDownloadDir(btnNo);
 
-        if(btnNo<6){
+        if (btnNo < 6) {
             youtubeDL.addOption("-x");
             youtubeDL.addOption("--audio-format", "mp3");
-            youtubeDL.addOption("--audio-quality", quality+"K");
+            youtubeDL.addOption("--audio-quality", quality + "K");
             youtubeDL.addOption("--embed-thumbnail");
-        }else if(btnNo>6 && btnNo<12){
-            youtubeDL.addOption("-f", "bestvideo[height="+quality+"]+bestaudio/best");
+        } else if (btnNo > 6 && btnNo < 12) {
+            youtubeDL.addOption("-f", "bestvideo[height=" + quality + "]+bestaudio/best");
         }
 
 
-        youtubeDL.addOption("-o", ytdlDir.getAbsolutePath()+"/%(title)s.%(ext)s");
-        return  youtubeDL;
+        youtubeDL.addOption("-o", ytdlDir.getAbsolutePath() + "/%(title)s.%(ext)s");
+        return youtubeDL;
     }
 
     private void prepareDownloading() {
         try {
             imm.hideSoftInputFromWindow(etUrl.getWindowToken(), 0);
-        }catch (Exception e){
+        } catch (Exception e) {
             View rootView = findViewById(android.R.id.content);
             Snackbar.make(rootView, "Something wrong..", Snackbar.LENGTH_LONG).show();
+        }finally {
+            linkChecking();
         }
-        linkChecking();
     }
 
     private void showProgressDialog(String info, Boolean indeterminate) {
@@ -134,26 +171,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog.show();
     }
 
-    private void linkChecking()  {
+    private void linkChecking() {
         showProgressDialog("Checking URL", true);
 
         // because of this YoutubeDL.getInstance(),
         // run it in a thread.
-        new Thread(()->{
+        new Thread(() -> {
             try {
                 videoInfo = YoutubeDL.getInstance().getInfo(url);
                 if (videoInfo != null)
-                    runOnUiThread(()->{
+                    runOnUiThread(() -> {
                         progressDialog.dismiss();
                         showBottomSheetDownloadOptions(videoInfo);
                     });
-            }catch (YoutubeDLException e){
+            } catch (YoutubeDLException e) {
                 showException(e);
-            }catch (InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     View parentView = findViewById(android.R.id.content);
-                    Snackbar.make(parentView, "InterruptedException "+e.getMessage(), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(parentView, "InterruptedException " + e.getMessage(), Snackbar.LENGTH_LONG).show();
                 });
             }
         }).start();
@@ -167,16 +204,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void startDownload() {
 
-        if(downloading){
+        if (downloading) {
             Toast.makeText(this, "Downloading in progress", Toast.LENGTH_SHORT).show();
         }
 
-        if(!isStoragePermissionGranted()){
+        if (!isStoragePermissionGranted()) {
             Toast.makeText(this, "Give storage permission and retry..", Toast.LENGTH_SHORT).show();
             return;
         }
         showStart();
-        downloading=true;
+        downloading = true;
 
         showProgressDialog("Downloading..", false);
         getMp3();
@@ -191,7 +228,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     YoutubeDLRequest youtubeDLRequest = buildRequest();
                     YoutubeDLResponse youtubeDLResponse = YoutubeDL.getInstance().execute(youtubeDLRequest, callback);
 
-                    runOnUiThread(()->{
+                    runOnUiThread(() -> {
+                        // extracting audio
+                        // adding thumbnail to audio
+
+                        mNotificationBuilder.setProgress(0, 0, false)
+                                .setContentText("Please wait. Converting audio file")
+                                .setOngoing(false)
+                                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setOnlyAlertOnce(true)
+                                .setContentIntent(pendingIntentActivity);
+                        notificationManager.notify(2, mNotificationBuilder.build());
+                        showProgressDialog("Converting audio file.. Please wait", true);
+                        tvDownloadStatus.setText("Please wait. Converting audio file");
+
+
+                        // writing output file
                         endLoading(youtubeDLResponse);
                     });
                 } catch (YoutubeDLException e) {
@@ -199,23 +252,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     showException(e);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
             }
         }).start();
     }
 
-    void showException(YoutubeDLException e){
-        switch (getExceptionCode(e.getMessage())){
+    void showException(YoutubeDLException e) {
+        switch (getExceptionCode(e.getMessage())) {
             case 1:
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     View parentLayout = findViewById(android.R.id.content);
-                    Snackbar.make(parentLayout,"Invalid URL", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(parentLayout, "Invalid URL", Snackbar.LENGTH_LONG).show();
 
                     endLoading(e.getMessage());
                 });
                 break;
             case 2:
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     View parentLayout = findViewById(android.R.id.content);
                     Snackbar.make(parentLayout, "No Internet Connection", Snackbar.LENGTH_LONG).show();
 
@@ -223,35 +277,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
                 break;
             case 0:
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     View parentLayout = findViewById(android.R.id.content);
                     Snackbar.make(parentLayout, "Something wrong..", Snackbar.LENGTH_LONG).show();
                     endLoading(e.getMessage());
                 });
                 break;
             case 3:
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     View parentLayout = findViewById(android.R.id.content);
                     Snackbar.make(parentLayout, "Failed to fetch video information", Snackbar.LENGTH_LONG).show();
                     endLoading(e.getMessage());
                 });
                 break;
             case 4:
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     View parentLayout = findViewById(android.R.id.content);
                     Snackbar.make(parentLayout, "Unable to parse video information", Snackbar.LENGTH_LONG).show();
                     endLoading(e.getMessage());
                 });
                 break;
             case 5:
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     View parentLayout = findViewById(android.R.id.content);
                     Snackbar.make(parentLayout, "Unable to download thumbnail.", Snackbar.LENGTH_LONG).show();
                     endLoading(e.getMessage());
                 });
                 break;
             case 6:
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     View parentLayout = findViewById(android.R.id.content);
                     Snackbar.make(parentLayout, "Unable to convert audio.", Snackbar.LENGTH_LONG).show();
                     endLoading(e.getMessage());
@@ -261,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    void endLoading(YoutubeDLResponse youtubeDLResponse){
+    void endLoading(YoutubeDLResponse youtubeDLResponse) {
         tvCommandOutput.setText(youtubeDLResponse.getOut());
         tvDownloadStatus.setText("Download Complete");
         pgLoading.setProgress(100);
@@ -270,9 +324,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pgLoop.setVisibility(View.GONE);
         progressDialog.dismiss();
         downloading = false;
+
+
+        mNotificationBuilder.setProgress(0, 0, false)
+                .setContentText("Download completed.")
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setOngoing(false);
+        notificationManager.notify(2, mNotificationBuilder.build());
+        Toast.makeText(this, "Download Finished", Toast.LENGTH_SHORT).show();
     }
 
-    void endLoading(String errorMessage){
+    void endLoading(String errorMessage) {
         tvCommandOutput.setText(errorMessage);
         tvDownloadStatus.setText("Download Failed.");
         pgLoading.setProgress(100);
@@ -281,26 +343,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         etUrl.setEnabled(true);
         progressDialog.dismiss();
         downloading = false;
+
+        mNotificationBuilder.setProgress(0, 0, false)
+                .setContentText("Download failed")
+                .setOngoing(false)
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp);
+        notificationManager.notify(2, mNotificationBuilder.build());
     }
 
-    private int getExceptionCode(String error){
+    private int getExceptionCode(String error) {
         String code1 = "is not a valid URL";
         String code2 = "Unable to download webpage";
         String code3 = "Failed to fetch video information";
         String code4 = "Unable to parse video information";
         String code5 = "Unable to download thumbnail";
         String code6 = "audio conversion failed";
-        if (error.contains(code1)){
+        if (error.contains(code1)) {
             return 1;
-        }else if ( error.contains(code2)){
+        } else if (error.contains(code2)) {
             return 2;
-        }else if (error.contains(code3)){
+        } else if (error.contains(code3)) {
             return 3;
-        }else if (error.contains(code4)){
+        } else if (error.contains(code4)) {
             return 4;
-        }else if (error.contains(code5)){
+        } else if (error.contains(code5)) {
             return 5;
-        }else if (error.contains(code6)){
+        } else if (error.contains(code6)) {
             return 6;
         }
         return 0;
@@ -320,13 +388,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         File youtubeAudioDir = new File(downloadDir, "FreeStuff/Free MP3");
         File youtubeVideoDir = new File(downloadDir, "FreeStuff/Free Video");
 
-        if (btnNo<6) {
+        if (btnNo < 6) {
             // MP3
             if (!youtubeAudioDir.exists()) {
                 youtubeAudioDir.mkdirs();
             }
             return youtubeAudioDir;
-        }else{
+        } else {
             // MP4
             if (!youtubeVideoDir.exists()) {
                 youtubeVideoDir.mkdirs();
@@ -336,14 +404,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean isStoragePermissionGranted() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 return true;
-            }else{
+            } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 return false;
             }
-        }else{
+        } else {
             return true;
         }
     }
@@ -354,7 +422,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.quality = quality;
         // dismiss bottom sheet after user has chosen to download a mp3 or mp4
         bottomSheet.dismiss();
-        Toast.makeText(this, "Starting to download "+videoInfo.getTitle(), Toast.LENGTH_LONG).show();
+
+        // show fragment pointing to download activity
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        viewDownloadFragment = ViewDownloadFragment.newInstance(btnNo, quality);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.viewDownload, viewDownloadFragment, "View Download Fragment");
+        fragmentTransaction.commit();
+
+        mNotificationBuilder.setContentText("Downloading in progress")
+                .setProgress(100, 0, false)
+                .setOngoing(true)
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setOnlyAlertOnce(true)
+                .setContentTitle("Downloading..")
+                .setContentIntent(pendingIntentActivity);
+        notificationManager.notify(2, mNotificationBuilder.build());
+
         startDownload();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

@@ -1,6 +1,7 @@
 package com.kheileang.freemp3video;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -36,7 +37,7 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
 
     ImageView thumbnail;
     TextView tvDuration, tvModalTitle, tvUploader;
-    TextView tv144, tv240, tv480, tv720, tv1080, tv360;
+    TextView tv240, tv480, tv720, tv1080, tv360;
     MaterialCardView one, two, three, four, five, seven, eight, nine, ten, eleven;
     FragmentListener fragmentListener;
 
@@ -211,7 +212,6 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
                 });
             }
 
-
         }).start();
         tv240.setText(sizes[0]);
         tv360.setText(sizes[1]);
@@ -289,8 +289,6 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
                 break;
         }
     }
-
-
 }
 
 class DownloadFormat{
