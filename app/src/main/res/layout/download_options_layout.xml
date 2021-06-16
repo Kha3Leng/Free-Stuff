@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:saveEnabled="false"
     android:layout_gravity="center_horizontal">
 
     <LinearLayout
@@ -38,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:text="10:10"
                     android:padding="10dp"
-                    android:textColor="@color/gris"
+                    android:textColor="@color/white"
                     android:layout_alignBottom="@+id/thumbnail"
                     android:layout_alignRight="@id/thumbnail"/>
 

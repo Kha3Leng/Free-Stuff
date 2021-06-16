@@ -38,8 +38,10 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
     ImageView thumbnail;
     TextView tvDuration, tvModalTitle, tvUploader;
     TextView tv240, tv480, tv720, tv1080, tv360;
+    TextView tv70, tv128, tv160, tv256, tv320;
     MaterialCardView one, two, three, four, five, seven, eight, nine, ten, eleven;
     FragmentListener fragmentListener;
+    long mp3Length;
 
     public DownloadOptionsSheetFragment(VideoInfo videoInfo) {
         this.videoInfo = videoInfo;
@@ -60,6 +62,12 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
         tv480 = view.findViewById(R.id.mp4480Label);
         tv720 = view.findViewById(R.id.mp4720Label);
         tv1080 = view.findViewById(R.id.mp41080Label);
+
+        tv70 = view.findViewById(R.id.mp370Label);
+        tv128 = view.findViewById(R.id.mp3128Label);
+        tv160 = view.findViewById(R.id.mp3160Label);
+        tv256 = view.findViewById(R.id.mp3256Label);
+        tv320 = view.findViewById(R.id.mp3320Label);
 
         new Thread(()->{
             try {
@@ -84,9 +92,13 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
         int secs = videoInfo.getDuration();
         int min = secs/60;
         int sec = secs%60;
-        String minutes = min<10?"0"+min:""+min;
+        int hr = min>=60?min/60:0;
+        min = (min % 60);
+        String minutes = min<10?(min==0?"00":"0"+min):""+min;
+        String hour = hr<10?(hr==0?"00":"0"+hr):""+hr;
+        String seconds = sec<10?(sec==0?"00":"0"+sec):""+sec;
 
-        tvDuration.setText(""+minutes+":"+sec);
+        tvDuration.setText(hour+":"+minutes+":"+seconds);
         tvModalTitle.setText(videoInfo.getTitle());
         tvUploader.setText(videoInfo.getUploader());
 
@@ -123,14 +135,6 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
             List<VideoFormat> videoFormats = videoInfo.getFormats();
             Map<Integer, DownloadFormat> downloadFormatHashMap = new HashMap<>();
 
-            // filter out formats other than mp4
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                for(int i=0; i<videoFormats.size(); i++){
-                    if(!videoFormats.get(i).getExt().equalsIgnoreCase("mp4")){
-                        videoFormats.remove(i);
-                    }
-                }
-            }
 
             for (VideoFormat videoFormat: videoFormats) {
                 downloadFormatHashMap.put(videoFormat.getHeight(), new DownloadFormat(videoFormat.getExt(), videoFormat.getFilesize()));
@@ -143,6 +147,14 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
                 sizes[0] = "false";
             }
 
+            // get base mp3 file size
+            mp3Length = downloadFormatHashMap.get(0).getFileSize()*100/10;
+
+            tv70.setText((double)Math.round(sizeInMB(mp3Length))/100 + "MB");
+            tv128.setText((double)Math.round(sizeInMB(mp3Length)*1.2)/100 + "MB");
+            tv160.setText((double)Math.round(sizeInMB(mp3Length)*1.25)/100 + "MB");
+            tv256.setText((double)Math.round(sizeInMB(mp3Length)*1.29)/100 + "MB");
+            tv320.setText((double)Math.round(sizeInMB(mp3Length)*2)/100 +"MB");
 
             downloadFormat = downloadFormatHashMap.get(360);
             if (downloadFormat != null) {

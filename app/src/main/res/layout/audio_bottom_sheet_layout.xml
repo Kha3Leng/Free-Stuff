@@ -46,7 +46,7 @@
                 <TextView
                     android:id="@+id/mp370Label"
                     style="@style/downloadButtonLabelStyle"
-                    android:text="2.0MB"/>
+                    android:text="..."/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -72,7 +72,7 @@
                 <TextView
                     android:id="@+id/mp3128Label"
                     style="@style/downloadButtonLabelStyle"
-                    android:text="3.7MB"/>
+                    android:text="..."/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -99,7 +99,7 @@
                 <TextView
                     android:id="@+id/mp3160Label"
                     style="@style/downloadButtonLabelStyle"
-                    android:text="3.9MB"/>
+                    android:text="..."/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -125,7 +125,7 @@
                 <TextView
                     android:id="@+id/mp3256Label"
                     style="@style/downloadButtonLabelStyle"
-                    android:text="6.7MB"/>
+                    android:text="..."/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -153,7 +153,7 @@
                 <TextView
                     android:id="@+id/mp3320Label"
                     style="@style/downloadButtonLabelStyle"
-                    android:text="8.9MB"/>
+                    android:text="..."/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -197,8 +197,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showBottomSheetDownloadOptions(VideoInfo videoInfo) {
-        bottomSheet = new DownloadOptionsSheetFragment(videoInfo);
-        bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
+        try {
+            bottomSheet = new DownloadOptionsSheetFragment(videoInfo);
+            bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
+        }catch (IllegalStateException e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -229,21 +233,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     YoutubeDLResponse youtubeDLResponse = YoutubeDL.getInstance().execute(youtubeDLRequest, callback);
 
                     runOnUiThread(() -> {
-                        // extracting audio
-                        // adding thumbnail to audio
-
-                        mNotificationBuilder.setProgress(0, 0, false)
-                                .setContentText("Please wait. Converting audio file")
-                                .setOngoing(false)
-                                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                .setOnlyAlertOnce(true)
-                                .setContentIntent(pendingIntentActivity);
-                        notificationManager.notify(2, mNotificationBuilder.build());
-                        showProgressDialog("Converting audio file.. Please wait", true);
-                        tvDownloadStatus.setText("Please wait. Converting audio file");
-
-
                         // writing output file
                         endLoading(youtubeDLResponse);
                     });
