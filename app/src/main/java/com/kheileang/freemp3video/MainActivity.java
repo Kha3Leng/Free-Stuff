@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         showStart();
         downloading = true;
 
-        showProgressDialog("Downloading..", false);
+//        showProgressDialog("Downloading..", false);
         getMp3();
 
     }
