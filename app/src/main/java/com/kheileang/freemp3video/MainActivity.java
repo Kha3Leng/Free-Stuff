@@ -42,6 +42,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.io.File;
+import java.util.Date;
 
 import static com.kheileang.freemp3video.App.CHANNEL_ID;
 import static com.kheileang.freemp3video.App.notificationManager;
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String TAG = MainActivity.class.getSimpleName();
     NotificationCompat.Builder mNotificationBuilder;
     PendingIntent pendingIntentActivity;
+    int m;
+
 
 
     final DownloadProgressCallback callback = new DownloadProgressCallback() {
@@ -77,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setOnlyAlertOnce(true)
                         .setContentIntent(pendingIntentActivity);
-                notificationManager.notify(2, mNotificationBuilder.build());
+                notificationManager.notify(m, mNotificationBuilder.build());
                 progressDialog.setProgress((int) progress);
                 tvDownloadStatus.setText(String.valueOf(progress) + "% ( ETA " + String.valueOf(etaInSeconds) + " seconds )");
 
@@ -229,6 +232,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run() {
                 try {
+                    runOnUiThread(()->{
+                        // get unique number for multiple notifications
+                        m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+                        mNotificationBuilder.setContentText("Downloading in progress")
+                                .setProgress(100, 0, false)
+                                .setOngoing(true)
+                                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setOnlyAlertOnce(true)
+                                .setContentTitle("Downloading..")
+                                .setContentIntent(pendingIntentActivity);
+                        notificationManager.notify(m, mNotificationBuilder.build());
+                    });
+
+
                     YoutubeDLRequest youtubeDLRequest = buildRequest();
                     YoutubeDLResponse youtubeDLResponse = YoutubeDL.getInstance().execute(youtubeDLRequest, callback);
 
@@ -314,12 +332,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog.dismiss();
         downloading = false;
 
-
         mNotificationBuilder.setProgress(0, 0, false)
-                .setContentText("Download completed.")
+                .setContentText(videoInfo.getFulltitle()+" has been downloaded.")
+                .setContentTitle("Download Completed")
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                 .setOngoing(false);
-        notificationManager.notify(2, mNotificationBuilder.build());
+        notificationManager.notify(m, mNotificationBuilder.build());
         Toast.makeText(this, "Download Finished", Toast.LENGTH_SHORT).show();
     }
 
@@ -337,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setContentText("Download failed")
                 .setOngoing(false)
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp);
-        notificationManager.notify(2, mNotificationBuilder.build());
+        notificationManager.notify(m, mNotificationBuilder.build());
     }
 
     private int getExceptionCode(String error) {
@@ -368,7 +386,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pgLoading.setProgress(0);
         pgLoading.setVisibility(View.GONE);
         pgLoop.setVisibility(View.GONE);
-        etUrl.setEnabled(false);
+        tvCommandOutput.setText("");
+        // etUrl.setEnabled(false);
 
     }
 
@@ -418,16 +437,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.viewDownload, viewDownloadFragment, "View Download Fragment");
         fragmentTransaction.commit();
-
-        mNotificationBuilder.setContentText("Downloading in progress")
-                .setProgress(100, 0, false)
-                .setOngoing(true)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setOnlyAlertOnce(true)
-                .setContentTitle("Downloading..")
-                .setContentIntent(pendingIntentActivity);
-        notificationManager.notify(2, mNotificationBuilder.build());
 
         startDownload();
     }
