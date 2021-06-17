@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -59,17 +61,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String url;
     InputMethodManager imm;
     int btnNo, quality;
-    VideoInfo videoInfo;
     DownloadOptionsSheetFragment bottomSheet;
     ViewDownloadFragment viewDownloadFragment;
     private static final String TAG = MainActivity.class.getSimpleName();
     NotificationCompat.Builder mNotificationBuilder;
     PendingIntent pendingIntentActivity;
-    int m;
+    Bitmap licon;
+    NotificationCompat.BigTextStyle bigTextStyle;
 
 
 
-    final DownloadProgressCallback callback = new DownloadProgressCallback() {
+    /*final DownloadProgressCallback callback = new DownloadProgressCallback() {
         @Override
         public void onProgressUpdate(float progress, long etaInSeconds) {
             runOnUiThread(() -> {
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             });
         }
-    };
+    };*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // building a notification
         mNotificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
+
+        licon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notifications_black_24dp);
+        bigTextStyle = new NotificationCompat.BigTextStyle();
     }
 
     @Override
@@ -181,7 +186,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // run it in a thread.
         new Thread(() -> {
             try {
-                videoInfo = YoutubeDL.getInstance().getInfo(url);
+
+                VideoInfo videoInfo = YoutubeDL.getInstance().getInfo(url);
                 if (videoInfo != null)
                     runOnUiThread(() -> {
                         progressDialog.dismiss();
@@ -209,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void startDownload() {
+    private void startDownload(VideoInfo videoInfo) {
 
         if (downloading) {
             Toast.makeText(this, "Downloading in progress", Toast.LENGTH_SHORT).show();
@@ -223,18 +229,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         downloading = true;
 
 //        showProgressDialog("Downloading..", false);
-        getMp3();
+        getMp3(videoInfo);
 
     }
 
-    private void getMp3() {
+    private void getMp3(VideoInfo videoInfo) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
+
+                    // get unique number for multiple notifications
+                    int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
                     runOnUiThread(()->{
-                        // get unique number for multiple notifications
-                        m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
                         mNotificationBuilder.setContentText("Downloading in progress")
                                 .setProgress(100, 0, false)
                                 .setOngoing(true)
@@ -247,22 +253,93 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     });
 
 
+                try {
                     YoutubeDLRequest youtubeDLRequest = buildRequest();
-                    YoutubeDLResponse youtubeDLResponse = YoutubeDL.getInstance().execute(youtubeDLRequest, callback);
+                    YoutubeDLResponse youtubeDLResponse = YoutubeDL.getInstance().execute(youtubeDLRequest,
+                            (progress, etaInSeconds) -> runOnUiThread(() -> {
+                                mNotificationBuilder.setProgress(100, (int) progress, false)
+                                        .setContentText(String.valueOf(progress) + "% ( ETA " + String.valueOf(etaInSeconds) + " seconds )")
+                                        .setOngoing(true)
+                                        .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                        .setOnlyAlertOnce(true)
+                                        .setContentIntent(pendingIntentActivity);
+                                notificationManager.notify(m, mNotificationBuilder.build());
+                                progressDialog.setProgress((int) progress);
+                                tvDownloadStatus.setText(String.valueOf(progress) + "% ( ETA " + String.valueOf(etaInSeconds) + " seconds )");
+
+                            }));
 
                     runOnUiThread(() -> {
                         // writing output file
-                        endLoading(youtubeDLResponse);
+                        endLoading(youtubeDLResponse, m, videoInfo);
                     });
                 } catch (YoutubeDLException e) {
                     e.printStackTrace();
-                    showException(e);
+                    showException(e, m, videoInfo);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
             }
         }).start();
+    }
+
+    void showException(YoutubeDLException e, int m, VideoInfo videoInfo) {
+        switch (getExceptionCode(e.getMessage())) {
+            case 1:
+                runOnUiThread(() -> {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Invalid URL", Snackbar.LENGTH_LONG).show();
+
+                    endLoading(e.getMessage(), m, videoInfo);
+                });
+                break;
+            case 2:
+                runOnUiThread(() -> {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "No Internet Connection", Snackbar.LENGTH_LONG).show();
+
+                    endLoading(e.getMessage(), m, videoInfo);
+                });
+                break;
+            case 0:
+                runOnUiThread(() -> {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Something wrong..", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage(), m, videoInfo);
+                });
+                break;
+            case 3:
+                runOnUiThread(() -> {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Failed to fetch video information", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage(), m, videoInfo);
+                });
+                break;
+            case 4:
+                runOnUiThread(() -> {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Unable to parse video information", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage(), m, videoInfo);
+                });
+                break;
+            case 5:
+                runOnUiThread(() -> {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Unable to download thumbnail.", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage(), m, videoInfo);
+                });
+                break;
+            case 6:
+                runOnUiThread(() -> {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Unable to convert audio.", Snackbar.LENGTH_LONG).show();
+                    endLoading(e.getMessage(), m, videoInfo);
+                });
+                break;
+
+        }
     }
 
     void showException(YoutubeDLException e) {
@@ -322,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    void endLoading(YoutubeDLResponse youtubeDLResponse) {
+    void endLoading(YoutubeDLResponse youtubeDLResponse, int m, VideoInfo videoInfo) {
         tvCommandOutput.setText(youtubeDLResponse.getOut());
         tvDownloadStatus.setText("Download Complete");
         pgLoading.setProgress(100);
@@ -332,13 +409,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog.dismiss();
         downloading = false;
 
+        bigTextStyle.bigText(videoInfo.getFulltitle()+" has been downloaded.");
+
         mNotificationBuilder.setProgress(0, 0, false)
                 .setContentText(videoInfo.getFulltitle()+" has been downloaded.")
                 .setContentTitle("Download Completed")
+                .setLargeIcon(licon)
+                .setStyle(bigTextStyle)
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                 .setOngoing(false);
         notificationManager.notify(m, mNotificationBuilder.build());
         Toast.makeText(this, "Download Finished", Toast.LENGTH_SHORT).show();
+    }
+
+    void endLoading(String errorMessage, int m, VideoInfo videoInfo) {
+        tvCommandOutput.setText(errorMessage);
+        tvDownloadStatus.setText("Download Failed.");
+        pgLoading.setProgress(100);
+        pgLoading.setVisibility(View.GONE);
+        pgLoop.setVisibility(View.GONE);
+        etUrl.setEnabled(true);
+        progressDialog.dismiss();
+        downloading = false;
+
+        bigTextStyle.bigText(videoInfo.getTitle()+" cannot be downloaded.");
+
+        mNotificationBuilder.setProgress(0, 0, false)
+                .setContentTitle("Download Failed")
+                .setLargeIcon(licon)
+                .setStyle(bigTextStyle)
+                .setOngoing(false)
+                .setContentText("Failed to download")
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp);
+        notificationManager.notify(m, mNotificationBuilder.build());
     }
 
     void endLoading(String errorMessage) {
@@ -350,12 +453,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         etUrl.setEnabled(true);
         progressDialog.dismiss();
         downloading = false;
-
-        mNotificationBuilder.setProgress(0, 0, false)
-                .setContentText("Download failed")
-                .setOngoing(false)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp);
-        notificationManager.notify(m, mNotificationBuilder.build());
     }
 
     private int getExceptionCode(String error) {
@@ -425,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onSendData(int btnNo, int quality) {
+    public void onSendData(int btnNo, int quality, VideoInfo videoInfo) {
         this.btnNo = btnNo;
         this.quality = quality;
         // dismiss bottom sheet after user has chosen to download a mp3 or mp4
@@ -438,7 +535,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fragmentTransaction.add(R.id.viewDownload, viewDownloadFragment, "View Download Fragment");
         fragmentTransaction.commit();
 
-        startDownload();
+        startDownload(videoInfo);
     }
 
 

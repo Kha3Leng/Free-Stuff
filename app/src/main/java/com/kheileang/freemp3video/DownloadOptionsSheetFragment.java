@@ -150,11 +150,13 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
             // get base mp3 file size
             mp3Length = downloadFormatHashMap.get(0).getFileSize()*100/10;
 
-            tv70.setText((double)Math.round(sizeInMB(mp3Length))/100 + "MB");
-            tv128.setText((double)Math.round(sizeInMB(mp3Length)*1.2)/100 + "MB");
-            tv160.setText((double)Math.round(sizeInMB(mp3Length)*1.25)/100 + "MB");
-            tv256.setText((double)Math.round(sizeInMB(mp3Length)*1.29)/100 + "MB");
-            tv320.setText((double)Math.round(sizeInMB(mp3Length)*2)/100 +"MB");
+            getActivity().runOnUiThread(()-> {
+                tv70.setText((double) Math.round(sizeInMB(mp3Length)) / 100 + "MB");
+                tv128.setText((double) Math.round(sizeInMB(mp3Length) * 1.2) / 100 + "MB");
+                tv160.setText((double) Math.round(sizeInMB(mp3Length) * 1.25) / 100 + "MB");
+                tv256.setText((double) Math.round(sizeInMB(mp3Length) * 1.29) / 100 + "MB");
+                tv320.setText((double) Math.round(sizeInMB(mp3Length) * 2) / 100 + "MB");
+            });
 
             downloadFormat = downloadFormatHashMap.get(360);
             if (downloadFormat != null) {
@@ -245,7 +247,7 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
     }
 
     interface FragmentListener{
-        void onSendData(int btnNo, int quality);
+        void onSendData(int btnNo, int quality, VideoInfo videoInfo);
     }
 
     @Override
@@ -270,34 +272,34 @@ public class DownloadOptionsSheetFragment extends BottomSheetDialogFragment impl
 
         switch (btnId){
             case R.id.one:
-                fragmentListener.onSendData(1, 70);
+                fragmentListener.onSendData(1, 70, videoInfo);
                 break;
             case R.id.two:
-                fragmentListener.onSendData(2, 128);
+                fragmentListener.onSendData(2, 128, videoInfo);
                 break;
             case R.id.three:
-                fragmentListener.onSendData(3, 160);
+                fragmentListener.onSendData(3, 160, videoInfo);
                 break;
             case R.id.four:
-                fragmentListener.onSendData(4, 256);
+                fragmentListener.onSendData(4, 256, videoInfo);
                 break;
             case R.id.five:
-                fragmentListener.onSendData(5, 320);
+                fragmentListener.onSendData(5, 320, videoInfo);
                 break;
             case R.id.seven:
-                fragmentListener.onSendData(7, 240);
+                fragmentListener.onSendData(7, 240, videoInfo);
                 break;
             case R.id.eight:
-                fragmentListener.onSendData(8, 360);
+                fragmentListener.onSendData(8, 360, videoInfo);
                 break;
             case R.id.nine:
-                fragmentListener.onSendData(9, 480);
+                fragmentListener.onSendData(9, 480, videoInfo);
                 break;
             case R.id.ten:
-                fragmentListener.onSendData(10,720);
+                fragmentListener.onSendData(10,720, videoInfo);
                 break;
             case R.id.eleven:
-                fragmentListener.onSendData(11, 1080);
+                fragmentListener.onSendData(11, 1080, videoInfo);
                 break;
         }
     }
