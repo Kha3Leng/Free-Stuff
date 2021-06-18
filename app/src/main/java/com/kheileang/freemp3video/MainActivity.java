@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.transition.Slide;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -36,6 +37,7 @@ import com.yausername.youtubedl_android.YoutubeDLRequest;
 import com.yausername.youtubedl_android.YoutubeDLResponse;
 import com.yausername.youtubedl_android.mapper.VideoInfo;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -114,6 +116,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnDownload = findViewById(R.id.btn);
         progressDialog = new ProgressDialog(this);
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        // bottom nav view
+        navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch (id){
+                    case R.id.navigation_dashboard:
+                        startActivity(new Intent(getApplicationContext(), DownloadActivity.class));
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + id);
+                }
+                return true;
+            }
+        });
 
         // intent for getActivity Notifiaction
         Intent intent = new Intent(this, DownloadActivity.class);

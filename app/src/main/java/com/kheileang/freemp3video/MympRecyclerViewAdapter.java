@@ -13,9 +13,9 @@ import java.util.List;
 
 public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<Mp3Mp4> mValues;
 
-    public MympRecyclerViewAdapter(List<DummyItem> items) {
+    public MympRecyclerViewAdapter(List<Mp3Mp4> items) {
         mValues = items;
     }
 
@@ -29,8 +29,8 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mIdView.setText(mValues.get(position).getTitle());
+        holder.mContentView.setText(String.valueOf(mValues.get(position).getId()));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
-        public DummyItem mItem;
+        public Mp3Mp4 mItem;
 
         public ViewHolder(View view) {
             super(view);
@@ -55,5 +55,51 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
         public String toString() {
             return super.toString() + " '" + mContentView.getText() + "'";
         }
+    }
+}
+
+class Mp3Mp4{
+    String title;
+    Boolean mp3;
+    String contentUri;
+    Long id;
+
+    public Mp3Mp4(String title, Boolean mp3, String contentUri, Long id) {
+        this.title = title;
+        this.mp3 = mp3;
+        this.contentUri = contentUri;
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Boolean getMp3() {
+        return mp3;
+    }
+
+    public void setMp3(Boolean mp3) {
+        this.mp3 = mp3;
+    }
+
+    public String getContentUri() {
+        return contentUri;
+    }
+
+    public void setContentUri(String contentUri) {
+        this.contentUri = contentUri;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

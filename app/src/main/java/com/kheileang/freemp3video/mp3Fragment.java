@@ -1,6 +1,9 @@
 package com.kheileang.freemp3video;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,31 +11,24 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.kheileang.freemp3video.dummy.DummyContent;
 
-/**
- * A fragment representing a list of Items.
- */
+import java.util.ArrayList;
+
 public class mp3Fragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
+    ArrayList<Mp3Mp4> mp3Mp4;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public mp3Fragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static mp3Fragment newInstance(int columnCount) {
         mp3Fragment fragment = new mp3Fragment();
         Bundle args = new Bundle();
@@ -55,6 +51,34 @@ public class mp3Fragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_mp3_list, container, false);
 
+        mp3Mp4 = new ArrayList<>();
+
+        Uri collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String[] projections = {MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.DATE_TAKEN};
+        String selections = MediaStore.Audio.Media.DATA + " like ?";
+        String[] selectionsArgs = new String[]{"%FreeStuff%"};
+        String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
+
+        Cursor mp3Cursor = getActivity()
+                .getApplicationContext()
+                .getContentResolver()
+                .query(collection, projections, selections, selectionsArgs, sortOrder);
+
+        int idCol = mp3Cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID);
+        int titleCol = mp3Cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME);
+
+        while(mp3Cursor.moveToNext()){
+            long id = mp3Cursor.getLong(idCol);
+            String title = mp3Cursor.getString(titleCol);
+
+            String contentUri = ContentUris.withAppendedId(collection, id).toString();
+
+            mp3Mp4.add(new Mp3Mp4(title,true, contentUri, id));
+        }
+
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -64,7 +88,7 @@ public class mp3Fragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MympRecyclerViewAdapter(DummyContent.ITEMS));
+            recyclerView.setAdapter(new MympRecyclerViewAdapter(mp3Mp4));
         }
         return view;
     }
