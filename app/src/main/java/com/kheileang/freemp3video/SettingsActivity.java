@@ -15,44 +15,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    BottomNavigationView navView;
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        navView.setSelectedItemId(R.id.navigation_setting);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
-
-        navView = findViewById(R.id.nav_view);
-        navView.setSelectedItemId(R.id.navigation_setting);
-
-        // bottom nav view
-        navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                switch (id){
-                    case R.id.navigation_home:
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-                        break;
-                    case R.id.navigation_media:
-                        startActivity(new Intent(getApplicationContext(), DownloadActivity.class));
-                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-                        break;
-                    case R.id.navigation_setting:
-                        return true;
-                    default:
-                        Toast.makeText(getApplicationContext(), "You clicked something wrong.", Toast.LENGTH_SHORT).show();;
-                }
-                return true;
-            }
-        });
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()

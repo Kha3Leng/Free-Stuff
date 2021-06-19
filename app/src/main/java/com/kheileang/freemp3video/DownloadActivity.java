@@ -16,19 +16,6 @@ public class DownloadActivity extends AppCompatActivity {
 
     TabLayout tabLayout;
     ViewPager viewPager;
-    BottomNavigationView navigationView;
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        navigationView.setSelectedItemId(R.id.navigation_media);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,33 +24,6 @@ public class DownloadActivity extends AppCompatActivity {
 
         tabLayout = findViewById(R.id.tab);
         viewPager = findViewById(R.id.pager);
-        navigationView = findViewById(R.id.nav_view);
-
-        navigationView.setSelectedItemId(R.id.navigation_media);
-
-        // bottom nav view
-        navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                switch (id){
-                    case R.id.navigation_home:
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-                        break;
-                    case R.id.navigation_media:
-                        return true;
-                    case R.id.navigation_setting:
-                        startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                        break;
-                    default:
-                        Toast.makeText(getApplicationContext(), "You clicked something wrong.", Toast.LENGTH_SHORT).show();;
-                }
-                return true;
-            }
-        });
-
         tabLayout.addTab(tabLayout.newTab().setText("MP3"));
         tabLayout.addTab(tabLayout.newTab().setText("Video"));
 
