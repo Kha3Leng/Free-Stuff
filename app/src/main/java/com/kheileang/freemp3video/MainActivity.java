@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     NotificationCompat.BigTextStyle bigTextStyle;
 
 
-
     /*final DownloadProgressCallback callback = new DownloadProgressCallback() {
         @Override
         public void onProgressUpdate(float progress, long etaInSeconds) {
@@ -92,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };*/
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,10 +101,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initListener();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navView.setSelectedItemId(R.id.navigation_home);
+    }
+
     private void initListener() {
         btnDownload.setOnClickListener(this);
     }
-
 
     private void initView() {
         tvCommandOutput = findViewById(R.id.commandOutput);
@@ -117,17 +122,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog = new ProgressDialog(this);
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
+        navView.setSelectedItemId(R.id.navigation_home);
+
         // bottom nav view
         navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 switch (id){
-                    case R.id.navigation_dashboard:
+                    case R.id.navigation_home:
+                        return true;
+                    case R.id.navigation_media:
                         startActivity(new Intent(getApplicationContext(), DownloadActivity.class));
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        break;
+                    case R.id.navigation_setting:
+                        startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         break;
                     default:
-                        throw new IllegalStateException("Unexpected value: " + id);
+                        Toast.makeText(MainActivity.this, "You clicked something wrong.", Toast.LENGTH_SHORT).show();;
                 }
                 return true;
             }

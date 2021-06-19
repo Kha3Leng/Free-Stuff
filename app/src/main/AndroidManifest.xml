@@ -16,11 +16,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FreeMP3Video">
+        <activity
+            android:name=".SettingsActivity"
+            android:launchMode="singleTask"></activity>
         <activity android:name=".DownloadActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:launchMode="singleTask"/>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

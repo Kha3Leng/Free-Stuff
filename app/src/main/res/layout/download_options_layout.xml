@@ -1,99 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
     android:orientation="vertical"
-    android:saveEnabled="false"
-    android:layout_gravity="center_horizontal">
+    android:saveEnabled="false">
+
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/handle" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="3dp">
-
-            <RelativeLayout
-                android:layout_width="130dp"
-                android:layout_height="80dp">
-
-                <ImageView
-                    android:layout_width="130dp"
-                    android:layout_height="80dp"
-                    android:src="@drawable/no_thumbnail"
-                    android:scaleType="centerCrop"
-                    android:id="@+id/thumbnail"
-                    android:text="10:25"
-                    android:gravity="right|bottom"
-                    android:padding="3dp"/>
-
-                <TextView
-                    android:id="@+id/duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="10:10"
-                    android:padding="10dp"
-                    android:textColor="@color/white"
-                    android:layout_alignBottom="@+id/thumbnail"
-                    android:layout_alignRight="@id/thumbnail"/>
-
-            </RelativeLayout>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="3dp">
 
-                <TextView
-                    android:id="@+id/modal_title"
-                    android:text="This is Modal Title."
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    style="@style/bottomSheetDescriptionStyle" />
+                <RelativeLayout
+                    android:layout_width="130dp"
+                    android:layout_height="80dp">
+
+                    <ImageView
+                        android:id="@+id/thumbnail"
+                        android:layout_width="130dp"
+                        android:layout_height="80dp"
+                        android:gravity="right|bottom"
+                        android:padding="3dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/no_thumbnail"
+                        android:text="10:25" />
+
+                    <TextView
+                        android:id="@+id/duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/thumbnail"
+                        android:layout_alignBottom="@+id/thumbnail"
+                        android:padding="10dp"
+                        android:text="10:10"
+                        android:textColor="@color/white" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/modal_title"
+                        style="@style/bottomSheetDescriptionStyle"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:text="This is Modal Title." />
 
 
-                <TextView
-                    style="@style/bottomSheetDescriptionStyle"
-                    android:id="@+id/uploader"
-                    android:layout_marginTop="10dp"
-                    android:text="uploader"/>
+                    <TextView
+                        android:id="@+id/uploader"
+                        style="@style/bottomSheetDescriptionStyle"
+                        android:layout_marginTop="10dp"
+                        android:text="uploader" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/pensive" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Download as"
+                android:textAlignment="textStart"
+                android:textColor="@color/bluenight"
+                android:textSize="14dp" />
+
+            <include
+                layout="@layout/audio_bottom_sheet_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <include
+                layout="@layout/video_bottom_sheet_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
-
-
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/pensive"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Download as"
-            android:textSize="14dp"
-            android:textColor="@color/bluenight"
-            android:textAlignment="textStart"/>
-
-        <include
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/audio_bottom_sheet_layout"/>
-
-        <include
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/video_bottom_sheet_layout"/>
-
     </LinearLayout>
 </FrameLayout>
