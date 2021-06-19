@@ -25,6 +25,7 @@ public class mp3Fragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     ArrayList<Mp3Mp4> mp3Mp4;
+    public static MympRecyclerViewAdapter adapter;
 
     public mp3Fragment() {
     }
@@ -69,15 +70,19 @@ public class mp3Fragment extends Fragment {
 
         int idCol = mp3Cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID);
         int titleCol = mp3Cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME);
+        int dataCol = mp3Cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
 
         while(mp3Cursor.moveToNext()){
             long id = mp3Cursor.getLong(idCol);
             String title = mp3Cursor.getString(titleCol);
+            String data = mp3Cursor.getString(dataCol);
 
             String contentUri = ContentUris.withAppendedId(collection, id).toString();
 
-            mp3Mp4.add(new Mp3Mp4(title,true, contentUri, id));
+            mp3Mp4.add(new Mp3Mp4(title,true, contentUri, id, data));
         }
+
+        adapter = new MympRecyclerViewAdapter(mp3Mp4);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -88,7 +93,7 @@ public class mp3Fragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MympRecyclerViewAdapter(mp3Mp4));
+            recyclerView.setAdapter(adapter);
         }
         return view;
     }
