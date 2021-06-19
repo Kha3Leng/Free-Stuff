@@ -20,13 +20,13 @@ public class TabAdapter extends FragmentStatePagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        switch (position){
+        switch (position) {
             case 0:
+                return new mp3Fragment();
             case 1:
-                return new mp3Fragment();
-            default:
-                return new mp3Fragment();
+                return new VideoFragment();
         }
+        return new mp3Fragment();
     }
 
     @Override

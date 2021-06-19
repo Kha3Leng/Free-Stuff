@@ -4,10 +4,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,21 +18,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.List;
 
-public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerViewAdapter.ViewHolder> {
+public class MyVideoRecyclerViewAdapter extends RecyclerView.Adapter<MyVideoRecyclerViewAdapter.ViewHolder> {
 
     private final List<Mp3Mp4> mValues;
     Context context;
 
-    public MympRecyclerViewAdapter(List<Mp3Mp4> items) {
+    public MyVideoRecyclerViewAdapter(List<Mp3Mp4> items) {
         mValues = items;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_mp3, parent, false);
+                .inflate(R.layout.fragment_video, parent, false);
         context = parent.getContext();
         return new ViewHolder(view);
     }
@@ -37,6 +41,18 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+        Bitmap thumbnail = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            try {
+                thumbnail = context.getContentResolver()
+                        .loadThumbnail(Uri.parse(holder.mItem.getContentUri()),
+                                new Size(100, 100),
+                                null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        holder.vidThumbnail.setImageBitmap(thumbnail);
         holder.mContentView.setText(mValues.get(position).getTitle());
     }
 
@@ -49,16 +65,17 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
         public final View mView;
         public final TextView mContentView;
         public Mp3Mp4 mItem;
-        public ImageView musicPlay, musicDelete, musicShare;
+        public ImageView musicPlay, musicDelete, musicShare, vidThumbnail;
         public MediaPlayer mp;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mContentView = view.findViewById(R.id.item_title);
+            mContentView = view.findViewById(R.id.video_title);
             musicPlay = view.findViewById(R.id.musicPlay);
             musicDelete = view.findViewById(R.id.musicDelete);
             musicShare = view.findViewById(R.id.musicShare);
+            vidThumbnail = view.findViewById(R.id.vidthumbnail);
 
             musicPlay.setOnClickListener(this::onClick);
             musicDelete.setOnClickListener(this::onClick);
@@ -105,57 +122,5 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
                     break;
             }
         }
-    }
-}
-
-class Mp3Mp4 {
-    String title;
-    Boolean mp3;
-    String contentUri;
-    String data;
-    Long id;
-
-    public Mp3Mp4(String title, Boolean mp3, String contentUri, Long id, String data) {
-        this.title = title;
-        this.mp3 = mp3;
-        this.contentUri = contentUri;
-        this.id = id;
-        this.data = data;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Boolean getMp3() {
-        return mp3;
-    }
-
-    public void setMp3(Boolean mp3) {
-        this.mp3 = mp3;
-    }
-
-    public String getContentUri() {
-        return contentUri;
-    }
-
-    public void setContentUri(String contentUri) {
-        this.contentUri = contentUri;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }

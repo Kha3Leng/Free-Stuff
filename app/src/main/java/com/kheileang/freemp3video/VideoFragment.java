@@ -18,14 +18,14 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-public class mp3Fragment extends Fragment {
+public class VideoFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private int mColumnCount = 1;
+    private int mColumnCount = 2;
     ArrayList<Mp3Mp4> mp3Mp4;
-    public static MympRecyclerViewAdapter adapter;
+    public static MyVideoRecyclerViewAdapter adapter;
 
-    public mp3Fragment() {
+    public VideoFragment() {
     }
 
     public static mp3Fragment newInstance(int columnCount) {
@@ -52,35 +52,35 @@ public class mp3Fragment extends Fragment {
 
         mp3Mp4 = new ArrayList<>();
 
-        Uri collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String[] projections = {MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.DISPLAY_NAME,
-                MediaStore.Audio.Media.DATE_TAKEN};
-        String selections = MediaStore.Audio.Media.DATA + " like ?";
+        Uri collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+        String[] projections = {MediaStore.Video.Media._ID,
+                MediaStore.Video.Media.DATA,
+                MediaStore.Video.Media.DISPLAY_NAME,
+                MediaStore.Video.Media.DATE_TAKEN};
+        String selections = MediaStore.Video.Media.DATA + " like ?";
         String[] selectionsArgs = new String[]{"%FreeStuff%"};
-        String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
+        String sortOrder = MediaStore.Video.Media.DATE_ADDED + " DESC";
 
-        Cursor mp3Cursor = getActivity()
+        Cursor videoCursor = getActivity()
                 .getApplicationContext()
                 .getContentResolver()
                 .query(collection, projections, selections, selectionsArgs, sortOrder);
 
-        int idCol = mp3Cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
-        int titleCol = mp3Cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-        int dataCol = mp3Cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+        int idCol = videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID);
+        int titleCol = videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME);
+        int dataCol = videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
 
-        while(mp3Cursor.moveToNext()){
-            long id = mp3Cursor.getLong(idCol);
-            String title = mp3Cursor.getString(titleCol);
-            String data = mp3Cursor.getString(dataCol);
+        while(videoCursor.moveToNext()){
+            long id = videoCursor.getLong(idCol);
+            String title = videoCursor.getString(titleCol);
+            String data = videoCursor.getString(dataCol);
 
             String contentUri = ContentUris.withAppendedId(collection, id).toString();
 
-            mp3Mp4.add(new Mp3Mp4(title,true, contentUri, id, data));
+            mp3Mp4.add(new Mp3Mp4(title,false, contentUri, id, data));
         }
 
-        adapter = new MympRecyclerViewAdapter(mp3Mp4);
+        adapter = new MyVideoRecyclerViewAdapter(mp3Mp4);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
