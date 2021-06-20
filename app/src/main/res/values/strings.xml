@@ -8,6 +8,15 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
+    <string name="about">
+        &lt;h3&gt;&lt;strong&gt;About This App&lt;/strong&gt;&lt;/h3&gt;&lt;br/&gt; &lt;article&gt; This app lets you download video from YouTube and then convert to mp3 of different qualities in one click. &lt;/article&gt; &lt;br/&gt;&lt;br/&gt; &lt;strong&gt;developed in 2021&lt;/strong&gt;
+
+    </string>
+
+    <string name="howto">
+        Happy coding
+    </string>
+
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>

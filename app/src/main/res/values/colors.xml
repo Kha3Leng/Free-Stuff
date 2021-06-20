@@ -19,6 +19,9 @@
     // lighter Color
     <color name="soda">#718093</color>
     <color name="chaingun">#576574</color>
+
+    <color name="status">#7f8fa6</color>
+    <color name="background">#dfe4ea</color>
     
     
     // light color
