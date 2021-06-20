@@ -24,8 +24,8 @@ public class DownloadActivity extends AppCompatActivity {
 
         tabLayout = findViewById(R.id.tab);
         viewPager = findViewById(R.id.pager);
-        tabLayout.addTab(tabLayout.newTab().setText("MP3"));
-        tabLayout.addTab(tabLayout.newTab().setText("Video"));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic__01_music));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic__02_video));
 
         TabAdapter adapter = new TabAdapter(getSupportFragmentManager(), 1, this, tabLayout.getTabCount());
         viewPager.setAdapter(adapter);

@@ -4,12 +4,12 @@
     <color name="white">#FFFFFFFF</color>
     
     // primary color
-    <color name="megamen">#0abde3</color>
-    <color name="cyanite">#0abde3</color>
+    <color name="megamen">#e67e22</color>
+    <color name="cyanite">#f39c12</color>
 
     // secondary color
-    <color name="carribean">#1dd1a1</color>
-    <color name="meadow">#10ac84</color>
+    <color name="carribean">#e74c3c</color>
+    <color name="meadow">#c0392b</color>
     
     // Dark Color
     <color name="prestiage">#2f3542</color>
