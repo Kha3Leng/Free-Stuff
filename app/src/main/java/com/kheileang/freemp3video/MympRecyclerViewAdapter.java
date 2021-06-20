@@ -79,12 +79,17 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
                 case R.id.musicPlay:
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setType("audio/*");
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(mItem.getContentUri()));
                     intent.setData(Uri.parse(mItem.getContentUri()));
                     context.startActivity(intent);
                     break;
                 case R.id.musicShare:
-
-                    Toast.makeText(context, "Music is shared", Toast.LENGTH_SHORT).show();
+                    Intent intent1 = new Intent(Intent.ACTION_SEND);
+                    intent1.setType("audio/*");
+                    intent1.putExtra(Intent.EXTRA_TITLE, mItem.getTitle());
+                    intent1.putExtra(Intent.EXTRA_SUBJECT, mItem.getTitle());
+                    intent1.putExtra(Intent.EXTRA_STREAM, Uri.parse(mItem.getContentUri()));
+                    context.startActivity(Intent.createChooser(intent1, "Share via"));
                     break;
                 case R.id.musicDelete:
                     if (context.getContentResolver().delete(Uri.parse(mItem.getContentUri()), null, null)>0)
