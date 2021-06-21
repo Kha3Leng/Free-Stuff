@@ -4,7 +4,7 @@
     <solid
         android:color="@color/pensive"/>
     <size
-        android:width="180dp"
+        android:width="140dp"
         android:height="3dp"/>
 
     <corners
