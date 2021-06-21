@@ -2,7 +2,9 @@ package com.kheileang.freemp3video;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaScannerConnection;
@@ -13,6 +15,8 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -94,28 +98,48 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
                     context.startActivity(Intent.createChooser(intent1, "Share via"));
                     break;
                 case R.id.musicDelete:
-                    if (context.getContentResolver().delete(Uri.parse(mItem.getContentUri()), null, null) > 0)
-                        Toast.makeText(context, mItem.getTitle() + " is deleted", Toast.LENGTH_SHORT).show();
-                    mValues.remove(mItem);
-                    new Thread(()->{
-                        MediaScannerConnection.scanFile(context, new String[]{
 
-                                        mItem.getData()},
-
-                                null, new MediaScannerConnection.OnScanCompletedListener() {
-
-                                    public void onScanCompleted(String path, Uri uri) {
-                                        Handler handler = new Handler(Looper.getMainLooper());
-                                        handler.post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                notifyDataSetChanged();
-                                            }
-                                        });
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                    alertDialog.setTitle("Delete " + mItem.getTitle() + "?")
+                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    try {
+                                        if (context.getContentResolver().delete(Uri.parse(mItem.getContentUri()), null, null) > 0) {
+                                            Animation anim = AnimationUtils.loadAnimation(context, R.anim.slide_out_right);
+                                            anim.setDuration(1000);
+                                            mView.startAnimation(anim);
+                                            Toast.makeText(context, mItem.getTitle() + " is deleted", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }catch (SecurityException exception){
+                                        exception.printStackTrace();
+                                        Toast.makeText(context, "You're trying to delete file no longer existing.", Toast.LENGTH_SHORT).show();
                                     }
+                                    new Thread(() -> {
+                                        mValues.remove(mItem);
+                                        MediaScannerConnection.scanFile(context, new String[]{
 
-                                });
-                    }).start();
+                                                        mItem.getData()},
+
+                                                null, new MediaScannerConnection.OnScanCompletedListener() {
+
+                                                    public void onScanCompleted(String path, Uri uri) {
+                                                        Handler handler = new Handler(Looper.getMainLooper());
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                notifyDataSetChanged();
+                                                            }
+                                                        },1000);
+                                                    }
+
+                                                });
+                                    }).start();
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .setCancelable(true)
+                            .show();
                     break;
             }
         }
