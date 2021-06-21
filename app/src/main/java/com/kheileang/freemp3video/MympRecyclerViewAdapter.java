@@ -8,6 +8,8 @@ import android.media.MediaPlayer;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,21 +94,28 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
                     context.startActivity(Intent.createChooser(intent1, "Share via"));
                     break;
                 case R.id.musicDelete:
-                    if (context.getContentResolver().delete(Uri.parse(mItem.getContentUri()), null, null)>0)
+                    if (context.getContentResolver().delete(Uri.parse(mItem.getContentUri()), null, null) > 0)
                         Toast.makeText(context, mItem.getTitle() + " is deleted", Toast.LENGTH_SHORT).show();
+                    mValues.remove(mItem);
+                    new Thread(()->{
+                        MediaScannerConnection.scanFile(context, new String[]{
 
-                    MediaScannerConnection.scanFile(context, new String[]{
+                                        mItem.getData()},
 
-                                    mItem.getData()},
+                                null, new MediaScannerConnection.OnScanCompletedListener() {
 
-                            null, new MediaScannerConnection.OnScanCompletedListener() {
+                                    public void onScanCompleted(String path, Uri uri) {
+                                        Handler handler = new Handler(Looper.getMainLooper());
+                                        handler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                notifyDataSetChanged();
+                                            }
+                                        });
+                                    }
 
-                                public void onScanCompleted(String path, Uri uri) {
-                                    mValues.remove(mItem);
-                                    notifyDataSetChanged();
-                                }
-
-                            });
+                                });
+                    }).start();
                     break;
             }
         }

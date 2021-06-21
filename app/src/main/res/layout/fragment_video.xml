@@ -28,8 +28,7 @@
             android:maxLines="2"
             android:padding="10dp"
             android:text="hello"
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:textColor="@color/pensive" />
+            android:textAppearance="?attr/textAppearanceListItem" />
 
     </RelativeLayout>
 

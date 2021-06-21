@@ -2,14 +2,17 @@ package com.kheileang.freemp3video;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,19 +114,31 @@ public class MyVideoRecyclerViewAdapter extends RecyclerView.Adapter<MyVideoRecy
                 case R.id.musicDelete:
                     if (context.getContentResolver().delete(Uri.parse(mItem.getContentUri()), null, null)>0)
                         Toast.makeText(context, mItem.getTitle() + " is deleted", Toast.LENGTH_SHORT).show();
+                    mValues.remove(mItem);
+                    new Thread(()->{
+                        MediaScannerConnection.scanFile(context, new String[]{
 
-                    MediaScannerConnection.scanFile(context, new String[]{
+                                        mItem.getData()},
 
-                                    mItem.getData()},
+                                null, new MediaScannerConnection.OnScanCompletedListener() {
 
-                            null, new MediaScannerConnection.OnScanCompletedListener() {
+                                    public void onScanCompleted(String path, Uri uri) {
+                                        Handler handler = new Handler(Looper.getMainLooper());
+                                        handler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                notifyDataSetChanged();
+                                                /*if (mValues.size()<1){
+                                                    FragmentManager fragmentManager = ((Activity)context).getFragmentManager();
+                                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                                    fragmentTransaction.replace(R.id.vidlist, new NoDataFragment());
+                                                }*/
+                                            }
+                                        });
+                                    }
 
-                                public void onScanCompleted(String path, Uri uri) {
-                                    mValues.remove(mItem);
-                                    notifyDataSetChanged();
-                                }
-
-                            });
+                                });
+                    }).start();
                     break;
             }
         }

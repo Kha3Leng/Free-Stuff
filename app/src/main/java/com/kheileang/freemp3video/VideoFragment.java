@@ -3,6 +3,7 @@ package com.kheileang.freemp3video;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -11,10 +12,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -78,6 +82,12 @@ public class VideoFragment extends Fragment {
             String contentUri = ContentUris.withAppendedId(collection, id).toString();
 
             mp3Mp4.add(new Mp3Mp4(title,false, contentUri, id, data));
+        }
+
+        // if no data show warning
+        if (mp3Mp4.size()<1){
+            view = inflater.inflate(R.layout.fragment_no_data, container, false);
+            return view;
         }
 
         adapter = new MyVideoRecyclerViewAdapter(mp3Mp4);

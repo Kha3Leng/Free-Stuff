@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.transition.Slide;
 import android.util.Log;
@@ -70,7 +71,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     PendingIntent pendingIntentActivity;
     Bitmap licon;
     NotificationCompat.BigTextStyle bigTextStyle;
+    PowerManager.WakeLock wakeLock;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navView.setSelectedItemId(R.id.navigation_home);
+    }
 
     /*final DownloadProgressCallback callback = new DownloadProgressCallback() {
         @Override
@@ -102,14 +109,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        navView.setSelectedItemId(R.id.navigation_home);
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Intent startIntent = intent;
+        String action = startIntent.getAction();
+        String type = startIntent.getType();
+        if(Intent.ACTION_SEND.equals(action) && type != null){
+            etUrl.setText(startIntent.getStringExtra(Intent.EXTRA_TEXT));
+        }
     }
 
     private void initListener() {
         btnDownload.setOnClickListener(this);
     }
+
 
     private void initView() {
         tvCommandOutput = findViewById(R.id.commandOutput);
@@ -121,6 +134,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnDownload = findViewById(R.id.btn);
         progressDialog = new ProgressDialog(this);
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK|PowerManager.ON_AFTER_RELEASE, "mainactivity:wakelock");
+
+        Intent startIntent = getIntent();
+        String action = startIntent.getAction();
+        String type = startIntent.getType();
+        if(Intent.ACTION_SEND.equals(action) && type != null){
+            etUrl.setText(startIntent.getStringExtra(Intent.EXTRA_TEXT));
+        }
 
         navView.setSelectedItemId(R.id.navigation_home);
 
@@ -224,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     runOnUiThread(() -> {
                         progressDialog.dismiss();
                         showBottomSheetDownloadOptions(videoInfo);
+                        wakeLock.acquire();
                     });
             } catch (YoutubeDLException e) {
                 showException(e);
@@ -273,13 +296,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // get unique number for multiple notifications
                     int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
                     runOnUiThread(()->{
-                        mNotificationBuilder.setContentText("Downloading in progress")
+                        mNotificationBuilder.setContentText(videoInfo.getTitle())
                                 .setProgress(100, 0, false)
                                 .setOngoing(true)
                                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                .setOnlyAlertOnce(true)
-                                .setContentTitle("Downloading..")
+                                .setContentTitle("Downloading in progress")
                                 .setContentIntent(pendingIntentActivity);
                         notificationManager.notify(m, mNotificationBuilder.build());
                     });
@@ -294,7 +316,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         .setOngoing(true)
                                         .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                                         .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                        .setOnlyAlertOnce(true)
                                         .setContentIntent(pendingIntentActivity);
                                 notificationManager.notify(m, mNotificationBuilder.build());
                                 progressDialog.setProgress((int) progress);
@@ -305,6 +326,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     runOnUiThread(() -> {
                         // writing output file
                         endLoading(youtubeDLResponse, m, videoInfo);
+                        if (wakeLock != null && wakeLock.isHeld())
+                            wakeLock.release();
                     });
                 } catch (YoutubeDLException e) {
                     e.printStackTrace();
