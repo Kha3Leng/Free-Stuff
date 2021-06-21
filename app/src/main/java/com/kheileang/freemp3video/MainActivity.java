@@ -22,6 +22,7 @@ import android.transition.Slide;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -71,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     PendingIntent pendingIntentActivity;
     Bitmap licon;
     NotificationCompat.BigTextStyle bigTextStyle;
-    PowerManager.WakeLock wakeLock;
 
     @Override
     protected void onResume() {
@@ -134,8 +134,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnDownload = findViewById(R.id.btn);
         progressDialog = new ProgressDialog(this);
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK|PowerManager.ON_AFTER_RELEASE, "mainactivity:wakelock");
 
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
@@ -235,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void linkChecking() {
         showProgressDialog("Checking URL", true);
-
         // because of this YoutubeDL.getInstance(),
         // run it in a thread.
         new Thread(() -> {
@@ -245,8 +242,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (videoInfo != null)
                     runOnUiThread(() -> {
                         progressDialog.dismiss();
+                        /*getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);*/
                         showBottomSheetDownloadOptions(videoInfo);
-                        wakeLock.acquire();
                     });
             } catch (YoutubeDLException e) {
                 showException(e);
@@ -326,8 +323,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     runOnUiThread(() -> {
                         // writing output file
                         endLoading(youtubeDLResponse, m, videoInfo);
-                        if (wakeLock != null && wakeLock.isHeld())
-                            wakeLock.release();
                     });
                 } catch (YoutubeDLException e) {
                     e.printStackTrace();
