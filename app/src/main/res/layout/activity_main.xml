@@ -41,28 +41,6 @@
             android:padding="5dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:text="Download Status"
-                android:textSize="16sp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:gravity="center_horizontal"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:id="@+id/downloadStatus"/>
-
-            <ProgressBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBarLoading"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/downloadStatus"
-                app:layout_constraintLeft_toLeftOf="parent"
-                android:layout_margin="50dp"
-                android:visibility="gone"/>
-
-
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,17 +51,10 @@
                 android:background="@color/ash"
                 android:layout_marginLeft="60dp"
                 android:layout_marginRight="60dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="35dp"
                 app:layout_constraintTop_toBottomOf="@+id/progressBarLoading"
                 app:layout_constraintLeft_toLeftOf="parent"
                 android:id="@+id/url"/>
-
-
-            <ProgressBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/pgb_progress4"
-                android:visibility="gone"/>
 
 
             <Button

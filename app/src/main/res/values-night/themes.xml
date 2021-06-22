@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.FreeMP3Video" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/prestiage</item>
-        <item name="colorPrimaryVariant">@color/gris</item>
+        <item name="colorPrimary">@color/carribean</item>
+        <item name="colorPrimaryVariant">@color/meadow</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/soda</item>

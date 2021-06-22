@@ -100,7 +100,7 @@ public class MympRecyclerViewAdapter extends RecyclerView.Adapter<MympRecyclerVi
                 case R.id.musicDelete:
 
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                    alertDialog.setTitle("Delete " + mItem.getTitle() + "?")
+                    alertDialog.setTitle("Are you sure you want to delete " + mItem.getTitle() + "?")
                             .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {

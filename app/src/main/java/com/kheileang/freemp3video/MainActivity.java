@@ -1,6 +1,7 @@
 package com.kheileang.freemp3video;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -20,8 +21,11 @@ import android.os.PowerManager;
 import android.text.TextUtils;
 import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -55,9 +59,8 @@ import static com.kheileang.freemp3video.App.notificationManager;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DownloadOptionsSheetFragment.FragmentListener {
 
-    TextView tvCommandOutput, tvDownloadStatus;
+    TextView tvCommandOutput;
     EditText etUrl;
-    ProgressBar pgLoading, pgLoop;
     BottomNavigationView navView;
     Button btnDownload;
     ProgressDialog progressDialog;
@@ -126,10 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         tvCommandOutput = findViewById(R.id.commandOutput);
-        tvDownloadStatus = findViewById(R.id.downloadStatus);
         etUrl = findViewById(R.id.url);
-        pgLoading = findViewById(R.id.progressBarLoading);
-        pgLoop = findViewById(R.id.pgb_progress4);
         navView = findViewById(R.id.nav_view);
         btnDownload = findViewById(R.id.btn);
         progressDialog = new ProgressDialog(this);
@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showProgressDialog(String info, Boolean indeterminate) {
+
         progressDialog.setMessage(info);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(indeterminate);
@@ -316,7 +317,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         .setContentIntent(pendingIntentActivity);
                                 notificationManager.notify(m, mNotificationBuilder.build());
                                 progressDialog.setProgress((int) progress);
-                                tvDownloadStatus.setText(String.valueOf(progress) + "% ( ETA " + String.valueOf(etaInSeconds) + " seconds )");
 
                             }));
 
@@ -451,11 +451,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void endLoading(YoutubeDLResponse youtubeDLResponse, int m, VideoInfo videoInfo) {
         tvCommandOutput.setText(youtubeDLResponse.getOut());
-        tvDownloadStatus.setText("Download Complete");
-        pgLoading.setProgress(100);
-        pgLoading.setVisibility(View.GONE);
         etUrl.setEnabled(true);
-        pgLoop.setVisibility(View.GONE);
         progressDialog.dismiss();
         downloading = false;
 
@@ -474,10 +470,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void endLoading(String errorMessage, int m, VideoInfo videoInfo) {
         tvCommandOutput.setText(errorMessage);
-        tvDownloadStatus.setText("Download Failed.");
-        pgLoading.setProgress(100);
-        pgLoading.setVisibility(View.GONE);
-        pgLoop.setVisibility(View.GONE);
         etUrl.setEnabled(true);
         progressDialog.dismiss();
         downloading = false;
@@ -496,10 +488,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void endLoading(String errorMessage) {
         tvCommandOutput.setText(errorMessage);
-        tvDownloadStatus.setText("Download Failed.");
-        pgLoading.setProgress(100);
-        pgLoading.setVisibility(View.GONE);
-        pgLoop.setVisibility(View.GONE);
         etUrl.setEnabled(true);
         progressDialog.dismiss();
         downloading = false;
@@ -529,10 +517,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showStart() {
-        tvDownloadStatus.setText("Start Downloading...");
-        pgLoading.setProgress(0);
-        pgLoading.setVisibility(View.GONE);
-        pgLoop.setVisibility(View.GONE);
         tvCommandOutput.setText("");
         // etUrl.setEnabled(false);
 
