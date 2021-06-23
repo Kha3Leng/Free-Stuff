@@ -17,6 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FreeMP3Video">
+        <receiver android:name=".MyNotiReceiver"/>
         <activity
             android:name=".SettingsActivity"
             android:launchMode="singleTask"

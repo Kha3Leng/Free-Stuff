@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ViewDownloadFragment viewDownloadFragment;
     private static final String TAG = MainActivity.class.getSimpleName();
     NotificationCompat.Builder mNotificationBuilder;
-    PendingIntent pendingIntentActivity;
+    PendingIntent pendingIntentActivity, pendingIntentBroadcast;
     Bitmap licon;
     NotificationCompat.BigTextStyle bigTextStyle;
 
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        switch (id){
+        switch (id) {
             case R.id.download_progress:
                 startActivity(new Intent(this, DownloadActivity.class));
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent startIntent = intent;
         String action = startIntent.getAction();
         String type = startIntent.getType();
-        if(Intent.ACTION_SEND.equals(action) && type != null){
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
             etUrl.setText(startIntent.getStringExtra(Intent.EXTRA_TEXT));
         }
     }
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
         String type = startIntent.getType();
-        if(Intent.ACTION_SEND.equals(action) && type != null){
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
             etUrl.setText(startIntent.getStringExtra(Intent.EXTRA_TEXT));
         }
 
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
-                switch (id){
+                switch (id) {
                     case R.id.navigation_home:
                         return true;
                     case R.id.navigation_media:
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         break;
                     default:
-                        Toast.makeText(MainActivity.this, "You clicked something wrong.", Toast.LENGTH_SHORT).show();;
+                        Toast.makeText(MainActivity.this, "You clicked something wrong.", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // building a notification
         mNotificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
+
 
         licon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notifications_black_24dp);
         bigTextStyle = new NotificationCompat.BigTextStyle();
@@ -235,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (Exception e) {
             View rootView = findViewById(android.R.id.content);
             Snackbar.make(rootView, "Something wrong..", Snackbar.LENGTH_LONG).show();
-        }finally {
+        } finally {
             linkChecking();
         }
     }
@@ -281,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             bottomSheet = new DownloadOptionsSheetFragment(videoInfo);
             bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
-        }catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             e.printStackTrace();
         }
     }
@@ -306,22 +307,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void getMp3(VideoInfo videoInfo) {
+
         new Thread(new Runnable() {
             @Override
             public void run() {
+                // get unique number for multiple notifications
+                int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+                // intent for getBroadcast Notification
+                Intent intent1 = new Intent(getApplicationContext(), MyNotiReceiver.class);
+                intent1.putExtra("thread_id", Thread.currentThread().getId());
+                intent1.putExtra("notificaiton_id", m);
+                pendingIntentBroadcast = PendingIntent.getBroadcast(getApplicationContext(), m, intent1, PendingIntent.FLAG_ONE_SHOT);
 
-                    // get unique number for multiple notifications
-                    int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
-                    runOnUiThread(()->{
-                        mNotificationBuilder.setContentText(videoInfo.getTitle())
-                                .setProgress(100, 0, false)
-                                .setOngoing(true)
-                                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                .setContentTitle("Downloading in progress")
-                                .setContentIntent(pendingIntentActivity);
-                        notificationManager.notify(m, mNotificationBuilder.build());
-                    });
+                runOnUiThread(() -> {
+                    mNotificationBuilder.setContentText(videoInfo.getTitle())
+                            .setProgress(100, 0, false)
+                            .setOngoing(true)
+                            .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setContentTitle("Downloading in progress")
+                            .setContentIntent(pendingIntentActivity)
+                            .addAction(R.drawable.ic__01_music, "Cancel", pendingIntentBroadcast);
+                    ;
+                    notificationManager.notify(m, mNotificationBuilder.build());
+                });
 
 
                 try {
@@ -332,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         .setContentText(String.valueOf(progress) + "% ( ETA " + String.valueOf(etaInSeconds) + " seconds )")
                                         .setOngoing(true)
                                         .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                                         .setContentIntent(pendingIntentActivity);
                                 notificationManager.notify(m, mNotificationBuilder.build());
                                 progressDialog.setProgress((int) progress);
@@ -474,10 +483,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog.dismiss();
         downloading = false;
 
-        bigTextStyle.bigText(videoInfo.getFulltitle()+" has been downloaded.");
+        bigTextStyle.bigText(videoInfo.getFulltitle() + " has been downloaded.");
 
         mNotificationBuilder.setProgress(0, 0, false)
-                .setContentText(videoInfo.getFulltitle()+" has been downloaded.")
+                .setContentText(videoInfo.getFulltitle() + " has been downloaded.")
                 .setContentTitle("Download Completed")
                 .setLargeIcon(licon)
                 .setStyle(bigTextStyle)
@@ -493,7 +502,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog.dismiss();
         downloading = false;
 
-        bigTextStyle.bigText(videoInfo.getTitle()+" cannot be downloaded.");
+        bigTextStyle.bigText(videoInfo.getTitle() + " cannot be downloaded.");
 
         mNotificationBuilder.setProgress(0, 0, false)
                 .setContentTitle("Download Failed")
@@ -591,9 +600,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startDownload(videoInfo);
     }
 
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }
