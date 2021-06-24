@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     PendingIntent pendingIntentActivity, pendingIntentBroadcast;
     Bitmap licon;
     NotificationCompat.BigTextStyle bigTextStyle;
+    FragmentManager fragmentManager;
 
     @Override
     protected void onResume() {
@@ -196,6 +197,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         licon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notifications_black_24dp);
         bigTextStyle = new NotificationCompat.BigTextStyle();
+
+        // show fragment pointing to download activity
+        fragmentManager = getSupportFragmentManager();
     }
 
     @Override
@@ -326,9 +330,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                             .setPriority(NotificationCompat.PRIORITY_HIGH)
                             .setContentTitle("Downloading in progress")
-                            .setContentIntent(pendingIntentActivity)
-                            .addAction(R.drawable.ic__01_music, "Cancel", pendingIntentBroadcast);
-                    ;
+                            .setContentIntent(pendingIntentActivity);
+                            /*.addAction(R.drawable.ic__01_music, "Cancel", pendingIntentBroadcast);*/
                     notificationManager.notify(m, mNotificationBuilder.build());
                 });
 
@@ -344,8 +347,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                                         .setContentIntent(pendingIntentActivity);
                                 notificationManager.notify(m, mNotificationBuilder.build());
-                                progressDialog.setProgress((int) progress);
-
+                                ViewDownloadFragment.pbLoading.setProgress((int) progress);
+                                ViewDownloadFragment.tvPercent.setText(progress+"% Saving...");
                             }));
 
                     runOnUiThread(() -> {
@@ -482,12 +485,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         etUrl.setEnabled(true);
         progressDialog.dismiss();
         downloading = false;
+        ViewDownloadFragment.pbLoading.setVisibility(View.GONE);
+        ViewDownloadFragment.tvPercent.setVisibility(View.GONE);
+        ViewDownloadFragment.ivFinish.setVisibility(View.VISIBLE);
 
         bigTextStyle.bigText(videoInfo.getFulltitle() + " has been downloaded.");
 
         mNotificationBuilder.setProgress(0, 0, false)
                 .setContentText(videoInfo.getFulltitle() + " has been downloaded.")
-                .setContentTitle("Download Completed")
+                .setContentTitle("Download Complete")
                 .setLargeIcon(licon)
                 .setStyle(bigTextStyle)
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
@@ -501,6 +507,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         etUrl.setEnabled(true);
         progressDialog.dismiss();
         downloading = false;
+        ViewDownloadFragment.pbLoading.setVisibility(View.GONE);
+        ViewDownloadFragment.tvPercent.setVisibility(View.GONE);
+        ViewDownloadFragment.ivFinish.setVisibility(View.VISIBLE);
 
         bigTextStyle.bigText(videoInfo.getTitle() + " cannot be downloaded.");
 
@@ -590,8 +599,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // dismiss bottom sheet after user has chosen to download a mp3 or mp4
         bottomSheet.dismiss();
 
-        // show fragment pointing to download activity
-        FragmentManager fragmentManager = getSupportFragmentManager();
         viewDownloadFragment = ViewDownloadFragment.newInstance(btnNo, quality);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.viewDownload, viewDownloadFragment, "View Download Fragment");

@@ -1,5 +1,6 @@
 package com.kheileang.freemp3video;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -8,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -17,6 +20,9 @@ public class ViewDownloadFragment extends Fragment implements View.OnClickListen
     private int quality;
 
     TextView tvDownloadView;
+    public static ProgressBar pbLoading;
+    public static ImageView ivFinish;
+    public static TextView tvPercent;
 
     public ViewDownloadFragment(int btnNo, int quality) {
         // Required empty public constructor
@@ -49,6 +55,14 @@ public class ViewDownloadFragment extends Fragment implements View.OnClickListen
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_download, container, false);
         tvDownloadView = view.findViewById(R.id.go_download);
+
+        pbLoading = view.findViewById(R.id.loading);
+        pbLoading.setProgress(0);
+
+        ivFinish = view.findViewById(R.id.finish);
+        tvPercent = view.findViewById(R.id.percent);
+        tvPercent.setText("View Downloading...");
+
         tvDownloadView.setOnClickListener(this);
         return view;
     }
