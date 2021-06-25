@@ -7,163 +7,315 @@
     android:background="@color/background"
     tools:context=".SettingsActivity">
 
-    <com.google.android.material.card.MaterialCardView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="30dp"
-
-        android:background="@color/white"
-        app:cardCornerRadius="10dp"
-        android:elevation="10dp"
-        app:layout_constraintDimensionRatio="h,6:12"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent">
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="15dp">
 
-            <TextView
-                android:id="@+id/rate_setting"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/second"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:textAppearance="@style/SettingTextStyle"
-                android:drawableStart="@drawable/ic_baseline_star_rate_36"
-                android:drawableLeft="@drawable/ic_baseline_star_rate_36"
-                android:drawablePadding="20dp"
-                android:drawableTint="@color/background"
-                android:gravity="center_vertical"
-                android:onClick="onClick"
-                android:text="Rate Us" />
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:elevation="10dp"
+                app:cardCornerRadius="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/first">
 
-            <TextView
-                android:id="@+id/share_setting"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="Version"
+                            android:textAppearance="@style/SettingTextStyle" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="@string/version"
+                            android:gravity="end"
+                            android:textAppearance="@style/SettingTextStyle"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="15dp"
+                        android:onClick="onClick"
+                        android:id="@+id/clear_cache">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="Cache"
+                            android:textAppearance="@style/SettingTextStyle" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:id="@+id/cacheSize"
+                            android:gravity="end"
+                            android:textAppearance="@style/SettingTextStyle"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Audio Storage Location"
+                            android:textAppearance="@style/SettingTextStyle" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/audio_location"
+                            android:text="0"
+                            android:textColor="@color/status"
+                            android:gravity="left"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Video Storage Location"
+                            android:textAppearance="@style/SettingTextStyle" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/video_location"
+                            android:text="0"
+                            android:textColor="@color/status"
+                            android:gravity="left"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="15dp"
+                        android:id="@+id/update_ytdl"
+                        android:onClick="onClick"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="Update Youtube-dl"
+                            android:textAppearance="@style/SettingTextStyle" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="v0.0"
+                            android:id="@+id/libVersion"
+                            android:textColor="@color/status"
+                            android:gravity="right"
+                            android:textAppearance="@style/SettingTextStyle"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/first"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:textAppearance="@style/SettingTextStyle"
-                android:drawableStart="@drawable/ic_baseline_mobile_screen_share_36"
-                android:drawableLeft="@drawable/ic_baseline_star_rate_36"
-                android:drawablePadding="20dp"
-                android:drawableTint="@color/background"
-                android:gravity="center_vertical"
-                android:onClick="onClick"
-                android:text="Share With Your Friend" />
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:elevation="10dp"
+                app:cardCornerRadius="10dp">
 
-            <TextView
-                android:id="@+id/other_app_setting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:textAppearance="@style/SettingTextStyle"
-                android:drawableStart="@drawable/ic_baseline_apps_36"
-                android:drawableLeft="@drawable/ic_baseline_apps_36"
-                android:drawablePadding="20dp"
-                android:drawableTint="@color/background"
-                android:gravity="center_vertical"
-                android:onClick="onClick"
-                android:text="Our Apps" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/policy_setting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:textAppearance="@style/SettingTextStyle"
-                android:drawableStart="@drawable/ic_baseline_privacy_tip_36"
-                android:drawableLeft="@drawable/ic_baseline_privacy_tip_36"
-                android:drawablePadding="20dp"
-                android:drawableTint="@color/background"
-                android:gravity="center_vertical"
-                android:onClick="onClick"
-                android:text="Privacy Policy" />
+                    <TextView
+                        android:id="@+id/rate_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:paddingTop="15dp"
+                        android:drawableStart="@drawable/ic_baseline_star_rate_36"
+                        android:drawableLeft="@drawable/ic_baseline_star_rate_36"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/background"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        android:text="Rate Us"
+                        android:textAppearance="@style/SettingTextStyle" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="10dp"
-                android:background="@color/soaring" />
+                    <TextView
+                        android:id="@+id/share_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:drawableStart="@drawable/ic_baseline_mobile_screen_share_36"
+                        android:drawableLeft="@drawable/ic_baseline_star_rate_36"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/background"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        android:text="Share With Your Friend"
+                        android:textAppearance="@style/SettingTextStyle" />
 
-            <TextView
-                android:id="@+id/howto_setting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:textAppearance="@style/SettingTextStyle"
-                android:drawableStart="@drawable/ic_baseline_verified_user_36"
-                android:drawableLeft="@drawable/ic_baseline_verified_user_36"
-                android:drawablePadding="20dp"
-                android:drawableTint="@color/background"
-                android:gravity="center_vertical"
-                android:onClick="onClick"
-                android:text="How To Use?" />
+                    <TextView
+                        android:id="@+id/other_app_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:drawableStart="@drawable/ic_baseline_apps_36"
+                        android:drawableLeft="@drawable/ic_baseline_apps_36"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/background"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        android:text="Our Apps"
+                        android:textAppearance="@style/SettingTextStyle" />
 
-            <TextView
-                android:id="@+id/demo_setting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:textAppearance="@style/SettingTextStyle"
-                android:drawableStart="@drawable/ic_baseline_music_video_36"
-                android:drawableLeft="@drawable/ic_baseline_music_video_36"
-                android:drawablePadding="20dp"
-                android:drawableTint="@color/background"
-                android:gravity="center_vertical"
-                android:onClick="onClick"
-                android:text="Demo Video" />
+                    <TextView
+                        android:id="@+id/policy_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:drawableStart="@drawable/ic_baseline_privacy_tip_36"
+                        android:drawableLeft="@drawable/ic_baseline_privacy_tip_36"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/background"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        android:text="Privacy Policy"
+                        android:textAppearance="@style/SettingTextStyle" />
 
-            <TextView
-                android:id="@+id/notworking_setting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:textAppearance="@style/SettingTextStyle"
-                android:drawableStart="@drawable/ic_baseline_error_36"
-                android:drawableLeft="@drawable/ic_baseline_error_36"
-                android:drawablePadding="20dp"
-                android:drawableTint="@color/background"
-                android:gravity="center_vertical"
-                android:onClick="onClick"
-                android:text="Apps Not Working" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="10dp"
+                        android:background="@color/soaring" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="10dp"
-                android:background="@color/soaring" />
+                    <TextView
+                        android:id="@+id/howto_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:drawableStart="@drawable/ic_baseline_verified_user_36"
+                        android:drawableLeft="@drawable/ic_baseline_verified_user_36"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/background"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        android:text="How To Use?"
+                        android:textAppearance="@style/SettingTextStyle" />
 
-            <TextView
-                android:id="@+id/feedback_setting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:textAppearance="@style/SettingTextStyle"
-                android:drawableStart="@drawable/ic_baseline_email_36"
-                android:drawableLeft="@drawable/ic_baseline_email_36"
-                android:drawablePadding="20dp"
-                android:drawableTint="@color/background"
-                android:gravity="center_vertical"
-                android:onClick="onClick"
-                android:text="Feedback" />
+                    <TextView
+                        android:id="@+id/demo_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:drawableStart="@drawable/ic_baseline_music_video_36"
+                        android:drawableLeft="@drawable/ic_baseline_music_video_36"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/background"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        android:text="Demo Video"
+                        android:textAppearance="@style/SettingTextStyle" />
 
+                    <TextView
+                        android:id="@+id/notworking_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:drawableStart="@drawable/ic_baseline_error_36"
+                        android:drawableLeft="@drawable/ic_baseline_error_36"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/background"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        android:text="Apps Not Working"
+                        android:textAppearance="@style/SettingTextStyle" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="10dp"
+                        android:background="@color/soaring" />
+
+                    <TextView
+                        android:id="@+id/feedback_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:paddingBottom="15dp"
+                        android:drawableStart="@drawable/ic_baseline_email_36"
+                        android:drawableLeft="@drawable/ic_baseline_email_36"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/background"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        android:text="Feedback"
+                        android:textAppearance="@style/SettingTextStyle" />
+
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
-    </com.google.android.material.card.MaterialCardView>
-
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

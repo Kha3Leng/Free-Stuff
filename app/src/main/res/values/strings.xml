@@ -31,4 +31,6 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="version">v.1.0.2</string>
+    <string name="bug_free">Update youtude-dl lib for bugs-free experience.</string>
 </resources>
